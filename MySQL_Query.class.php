@@ -533,7 +533,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Table: '.$this->Table;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end SetTable()
 
@@ -548,7 +548,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Join tables: '.$this->JoinTablesClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end SetJoinTable()
 
@@ -559,7 +559,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Lock tables: '.var_export($this->LockTables, true);
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetWhere()
@@ -571,7 +571,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Select columns: '.var_export($this->Columns, true);
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end SetColumns()
 
@@ -582,7 +582,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Where arguments: '.var_export($this->Where, true);
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetWhere()
@@ -599,7 +599,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Order By: '.$this->OrderBy;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end SetOrderBy()
 
@@ -611,7 +611,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Group By: '.$this->GroupBy;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetGroupBy()
@@ -640,7 +640,7 @@ final class MySQL_Query
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Limit: '.$this->Limit;
 						$LogData .= (!empty($this->Offset)) ? ' Offset: '.$this->Offset : ' No offset.';
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetLimit()
@@ -653,7 +653,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Values: '.$this->InsertValues;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetValues()
@@ -666,7 +666,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Duplicate Key: '.$this->DuplicateKey;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetDuplicateKey()
@@ -679,7 +679,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Engine: '.$this->Engine;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end SetEngine()
@@ -716,7 +716,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				
 			} # end BuildSelectQuery()
@@ -739,7 +739,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				
 			} # end BuildUpdateQuery()
@@ -763,7 +763,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				
 			} # end BuildInsertQuery()
@@ -789,7 +789,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildDeleteQuery()
 
@@ -802,7 +802,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildTruncateQuery()
 
@@ -814,7 +814,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildTruncateQuery()
 
@@ -826,7 +826,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildOptimizeQuery()
 
@@ -838,7 +838,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildShowColumnsQuery()
 
@@ -849,7 +849,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildShowTablesQuery()
 
@@ -863,7 +863,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildCreateTemporaryQuery()
 
@@ -875,7 +875,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildDropTemporaryQuery()
 
@@ -887,7 +887,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildLockTablesQuery()
 
@@ -898,7 +898,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end BuildUnlockTablesQuery()
 
@@ -957,7 +957,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Built select clause. '.$SelectClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $SelectClause;
 			} # end BuildSelectClause()
@@ -989,7 +989,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.'';
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $UpdateClause;
 			} # end BuildSelectClause()
@@ -1039,7 +1039,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Insert clause: '.$InsertClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $InsertClause;
 			} # end BuildInsertClause()
@@ -1064,7 +1064,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Duplicate key clause: '.$DuplicateKeyClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $DuplicateKeyClause;
 			} # end BuildOnDuplicateKeyClause()
@@ -1075,7 +1075,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Delete clause: '.$DeleteClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $DeleteClause;
 			} # end BuildSelectClause()
@@ -1163,7 +1163,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Table clause: '.$TableClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $TableClause;
 				
@@ -1180,7 +1180,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Join tables clause: '.$JoinTablesClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $JoinTablesClause;
 			} # end BuildJoinClause()
@@ -1206,7 +1206,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Where: '.$WhereClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $WhereClause;
 			} # end BuildWhereClause()
@@ -1225,7 +1225,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Order By: '.$OrderByClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $OrderByClause;
 			} # end BuildOrderByClause()
@@ -1246,7 +1246,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Limit: '.$LimitClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $LimitClause;
 			} # end BuildLimitClause()
@@ -1273,7 +1273,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Lock tables: '.$LockTablesClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $LockTablesClause;
 			}
@@ -1290,7 +1290,7 @@ final class MySQL_Query
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Engine: '.$EngineClause;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 				return $EngineClause;
 			}

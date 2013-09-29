@@ -526,7 +526,7 @@ final class MySQL_DB
 						$this->QueryObj->SetDebug(TRUE);
 
 						$LogData = __FILE__.' '.__METHOD__.' Connected.';
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $this->DB_Con;
@@ -568,7 +568,7 @@ final class MySQL_DB
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Select DB: '.$Database;
 						$LogData .= (!empty($returnValue)) ? 'DB selected.' : 'Select DB failed.';
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($returnValue == FALSE)
@@ -596,7 +596,7 @@ final class MySQL_DB
 			} # end Error()
 
 
-		public function EscapeString($String)
+		private function EscapeString($String)
 			{
 				$returnValue = null;
 				$returnValue = $this->DB_Con->real_escape_string($String);
@@ -611,7 +611,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -625,7 +625,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Setting: '.$Setting;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end AutoCommit()
@@ -637,7 +637,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Table: '.$this->Table;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end StartTrans()
@@ -650,7 +650,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($returnValue == FALSE)
@@ -669,7 +669,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($returnValue == FALSE)
@@ -681,7 +681,7 @@ final class MySQL_DB
 			} # end CommitTrans()
 
 
-		public function PrepareQuery()
+		private function PrepareQuery()
 			{
 				$returnValue = null;
 				if (empty($this->SQL))
@@ -696,7 +696,7 @@ final class MySQL_DB
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Prepare query: ';
 						$LogData .= (!empty($this->SQLStmt)) ? 'Statement prepared.' : 'Prepare statement failed.';
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($returnValue == FALSE)
@@ -736,7 +736,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Input params: '.var_export($this->InputParams, true);
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -763,7 +763,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -785,7 +785,7 @@ final class MySQL_DB
 								if ($this->Debug == TRUE)
 									{
 										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog();
+										$this->Debugging->WriteToLog($LogData);
 									}
 
 										throw new DBException('Fetch prepared results (assoc) failed.');
@@ -801,7 +801,7 @@ final class MySQL_DB
 								if ($this->Debug == TRUE)
 									{
 										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog();
+										$this->Debugging->WriteToLog($LogData);
 									}
 
 										throw new DBException('Fetch prepared results (object) failed.');
@@ -818,7 +818,7 @@ final class MySQL_DB
 								if ($this->Debug == TRUE)
 									{
 										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog();
+										$this->Debugging->WriteToLog($LogData);
 									}
 
 										throw new DBException('Fetch prepared results (arrau) failed.');
@@ -832,7 +832,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end FetchPreparedResults()
@@ -935,18 +935,18 @@ final class MySQL_DB
 					} else {
 						$LogData = __FILE__.' '.__METHOD__.'this->SQLstmt is missing.';
 						$LogData .= var_export(debug_backtrace(), true);
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 			} # end CloseStmt()
 
 
-		public function RunQuery()
+		private function RunQuery()
 			{
 				$returnValue = null;
 
@@ -965,7 +965,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -1006,7 +1006,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end FetchResults()
@@ -1022,7 +1022,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			} # end CloseResult()
@@ -1041,7 +1041,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -1061,7 +1061,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 			return $returnValue;
@@ -1128,7 +1128,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__.' Query type: '.$QueryType.' Run as: '.$RunAs;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				return $returnValue;
@@ -1142,7 +1142,7 @@ final class MySQL_DB
 				if ($this->Debug == TRUE)
 					{
 						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog();
+						$this->Debugging->WriteToLog($LogData);
 					}
 
 				if ($returnValue == FALSE)
