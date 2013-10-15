@@ -275,89 +275,91 @@ if (0 > version_compare(PHP_VERSION, '5'))
 		throw new Exception('This file was generated for PHP 5');
 	}
 
-interface QueryInterface
+abstract class QueryInterface
 	{
-		public function __construct(MySQL_DB $DB_Con);
+		abstract public function __construct($DB_Con);
 
-		public function __clone();
+		abstract public function __clone();
 
-		public function __destruct();
-		
-		public function StartDebugging();
-		
-    public function ResetQuery();
-		
-		public function SetQuery();
+		abstract public function __destruct();
 
-		public function SetTable($Table, $Alias = NULL);
+		abstract public function StartDebugging();
 
-		public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement);
+		abstract public function ResetQuery();
 
-		public function SetColumns(Array $Columns);
+		abstract public function SetDebug($Debug);
 
-		public function SetWhere(Array $Where);
+		abstract public function SetQuery($QueryType);
 
-		public function SetOrderBy($OrderBy, $Direction = NULL);
+		abstract public function SetTable($Table, $Alias = NULL);
 
-		public function SetGroupBy($GroupBy);
+		abstract public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement);
 
-		public function SetLimit($Limit, $Offset = NULL);
+		abstract public function SetColumns(Array $Columns);
 
-		public function GetSQL();
+		abstract public function SetWhere(Array $Where);
 
-		public function BuildSelectQuery();
+		abstract public function SetOrderBy($OrderBy, $Direction = NULL);
 
-		public function BuildUpdateQuery();
+		abstract public function SetGroupBy($GroupBy);
 
-		public function BuildInsertQuery();
+		abstract public function SetLimit($Limit, $Offset = NULL);
 
-		public function BuildDeleteQuery();
+		abstract public function GetSQL();
 
-		public function BuildAlterQuery();
+		abstract public function BuildSelectQuery();
 
-		public function BuildTruncateQuery();
+		abstract public function BuildUpdateQuery();
 
-		public function BuildOptimizeQuery();
+		abstract public function BuildInsertQuery();
 
-		public function BuildShowColumnsQuery();
+		abstract public function BuildDeleteQuery();
 
-		public function BuildShowTablesQuery();
+		abstract public function BuildAlterQuery();
 
-		public function BuildCreateTemporaryQuery();
+		abstract public function BuildTruncateQuery();
 
-		public function BuildDropTemporaryQuery();
+		abstract public function BuildOptimizeQuery();
 
-		public function BuildLockTablesQuery();
+		abstract public function BuildShowColumnsQuery();
 
-		public function BuildUnlockTablesQuery();
+		abstract public function BuildShowTablesQuery();
 
-		private function BuildSelectClause();
+		abstract public function BuildCreateTemporaryQuery();
 
-		private function BuildUpdateClause();
+		abstract public function BuildDropTemporaryQuery();
 
-		private function BuildInsertClause();
+		abstract public function BuildLockTablesQuery();
 
-		private function BuildOnDuplicateKeyClause();
+		abstract public function BuildUnlockTablesQuery();
 
-		private function BuildDeleteClause();
+		abstract protected function BuildSelectClause();
 
-		public function BuildAlterClause();
+		abstract protected function BuildUpdateClause();
 
-		public function BuildCreateTemporaryClause();
+		abstract protected function BuildInsertClause();
 
-		private function BuildTableClause($QueryType);
+		abstract protected function BuildOnDuplicateKeyClause();
 
-		private function BuildJoinClause();
+		abstract protected function BuildDeleteClause();
 
-		private function BuildWhereClause();
+		abstract protected function BuildAlterClause();
 
-		private function BuildOrderByClause();
+		abstract protected function BuildCreateTemporaryClause();
 
-		private function BuildLimitClause();
+		abstract protected function BuildTableClause($QueryType);
 
-		public function BuildLockTablesClause();
+		abstract protected function BuildJoinClause();
 
-		public function BuildEngineClause();
+		abstract protected function BuildWhereClause();
+
+		abstract protected function BuildOrderByClause();
+
+		abstract protected function BuildLimitClause();
+
+		abstract protected function BuildLockTablesClause();
+
+		abstract protected function BuildEngineClause();
 
 	} # end QueryInterface interface
 ?>

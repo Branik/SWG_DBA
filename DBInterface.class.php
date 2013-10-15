@@ -266,101 +266,99 @@ if (0 > version_compare(PHP_VERSION, '5'))
 		throw new Exception('This file was generated for PHP 5');
 	}
 
-require_once('interface.DBInterface.php');
-
 /* user defined includes */
 
 /* user defined constants */
 
 
-interface DBInterface
+abstract class DBInterface
 	{
-		public function __construct();
+		abstract public function __construct();
 
-		public function __clone();
+		abstract public function __clone();
 
-		public function __destruct();
+		abstract public function __destruct();
 
-		public function SetDebug($Debug);
+		abstract public function SetDebug($Debug);
 
-		public function SetTable($Table, $Alias = NULL);
+		abstract public function SetTable($Table, $Alias = NULL);
 
-		public function SetJoinTables(Array $Tables);
+		abstract public function SetJoinTables(Array $Tables);
 
-		public function SetLockTables(Array $LockTables);
+		abstract public function SetLockTables(Array $LockTables);
 
-		public function SetColumns(Array $Columns);
+		abstract public function SetColumns(Array $Columns);
 
-		public function SetWhere(Array $Where);
+		abstract public function SetWhere(Array $Where);
 
-		public function SetOrderBy($OrderBy, $Direction = NULL);
+		abstract public function SetOrderBy($OrderBy, $Direction = NULL);
 
-		public function SetGroupBy($GroupBy);
+		abstract public function SetGroupBy($GroupBy);
 
-		public function SetLimit($Limit, $Offset = NULL);
+		abstract public function SetLimit($Limit, $Offset = NULL);
 
-		public function SetInsertValues(Array $Values);
+		abstract public function SetInsertValues(Array $Values);
 
-		public function SetDuplicateKey($DuplicateKey);
+		abstract public function SetDuplicateKey($DuplicateKey);
 
-		public function SetEngine($Engine);
+		abstract public function SetEngine($Engine);
 
-		public function GetParamType($Value);
+		abstract public function GetParamType($Value);
 
-		public function StartDebugging();
+		abstract public function StartDebugging();
 
-		public function Connect($Database);
+		abstract public function Connect($Database);
 
-		public function Connected();
+		abstract public function Connected();
 
-		public function Close();
+		abstract public function Close();
 
-		public function SelectDB($Database);
+		abstract public function SelectDB($Database);
 
-		public function ErrorNo();
+		abstract public function ErrorNo();
 
-		public function Error();
+		abstract public function Error();
 
-		public function EscapeString($String);
+		abstract public function EscapeString($String);
 
-		public function InsertID();
+		abstract public function InsertID();
 
-		public function AutoCommit($Setting);
+		abstract public function AutoCommit($Setting);
 
-		public function StartTrans();
+		abstract public function StartTrans();
 
-		public function RollbackTrans();
+		abstract public function RollbackTrans();
 
-		public function CommitTrans();
+		abstract public function CommitTrans();
 
-		public function PrepareQuery();
+		abstract protected function PrepareQuery();
 
-		public function BindInputParams();
+		abstract public function BindInputParams();
 
-		public function ExecutePreparedQuery();
+		abstract public function ExecutePreparedQuery();
 
-		public function FetchPreparedResults($ReturnFormat = 'assoc');
+		abstract public function FetchPreparedResults($ReturnFormat = 'assoc');
 
-		public function StmtBindArray(&$ReturnArr);
+		abstract public function StmtBindArray(&$ReturnArr);
 
-		public function StmtBindAssoc(&$ReturnArr);
+		abstract public function StmtBindAssoc(&$ReturnArr);
 
-		public function StmtBindObject(&$ReturnObj);
+		abstract public function StmtBindObject(&$ReturnObj);
 
-		public function CloseStmt();
+		abstract public function CloseStmt();
 
-		public function RunQuery();
+		abstract protected function RunQuery();
 
-		public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
+		abstract public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
 
-		public function CloseResult();
+		abstract public function CloseResult();
 
-		public function NumRows();
+		abstract public function NumRows();
 
-		public function AffectedRows();
+		abstract public function AffectedRows();
 
-		public function Query($QueryType = NULL, $RunAs = 'Standard');
+		abstract public function Query($QueryType = NULL, $RunAs = 'Standard');
 
-		public function ShowTables();
+		abstract public function ShowTables();
 	} # end of interface DBInterface
 ?>

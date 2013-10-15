@@ -355,7 +355,7 @@ if (0 > version_compare(PHP_VERSION, '5'))
  *
  * @author Nicole Ward, <nikki@snowwolfegames.com>
  */
-require_once('interface.DBInterface.php');
+require_once('DBInterface.class.php');
 
 /* user defined includes */
 
@@ -363,12 +363,16 @@ require_once('interface.DBInterface.php');
 
 
 final class MySQL_DB
-			implements DBInterface
+			extends DBInterface
 	{
 
+		const DB_HOST = 'localhost';
+		const DB_USER = 'root';
+		const DB_PASS = '';
+		const DB_NAME = 'vintagee_gamedb';
 		protected $DB_Con = NULL;
 		protected $Debug = FALSE;
-		protected $Debugging = NULL;
+		public $Debugging = NULL;
 		protected $QueryObj = NULL;
 		protected $AutoCommit = NULL;
 		protected $SQL = NULL;
@@ -501,7 +505,7 @@ final class MySQL_DB
 		public function StartDebugging()
 			{
 				$this->Debugging = new Logger();
-				$this->Debugging->init($FileName, $IncludeDate = TRUE, $Priority = 'Medium', $LogType = 'Debugging', $Sendmail = FALSE);
+				$this->Debugging->init('sqldebug', TRUE, 'Medium', 'Debugging', FALSE);
 				$this->Debugging->OpenLogFile();
 			} # end StartDebugging()
 
@@ -509,7 +513,7 @@ final class MySQL_DB
 		public function Connect($Database)
 			{
 				# get our database connection
-				$this->DB_Con = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+				$this->DB_Con = new mysqli(self::DB_HOST, self::DB_USER, self::DB_PASS, self::DB_NAME);
 
 				# check connection
 				if (mysqli_connect_errno())
@@ -520,7 +524,7 @@ final class MySQL_DB
 				$this->DB_Con->query("SET NAMES 'utf8'");
 
 				# get our query object
-				$this->QueryObj = new Mysql_Query($this->DB_Con);
+				$this->QueryObj = new Mysql_Query($this);
 				if ($this->Debug == TRUE)
 					{
 						$this->QueryObj->SetDebug(TRUE);
@@ -596,7 +600,7 @@ final class MySQL_DB
 			} # end Error()
 
 
-		private function EscapeString($String)
+		public function EscapeString($String)
 			{
 				$returnValue = null;
 				$returnValue = $this->DB_Con->real_escape_string($String);
@@ -681,7 +685,7 @@ final class MySQL_DB
 			} # end CommitTrans()
 
 
-		private function PrepareQuery()
+		protected function PrepareQuery()
 			{
 				$returnValue = null;
 				if (empty($this->SQL))
@@ -946,7 +950,7 @@ final class MySQL_DB
 			} # end CloseStmt()
 
 
-		private function RunQuery()
+		protected function RunQuery()
 			{
 				$returnValue = null;
 
@@ -1076,7 +1080,7 @@ final class MySQL_DB
 					}
 				$returnValue = NULL;
 
-				$this->QueryObj->SetSQL($QueryType);
+				$this->QueryObj->SetQuery($QueryType);
 				$this->SQL = $this->QueryObj->GetSQL();
 
 				switch ($QueryType) {
