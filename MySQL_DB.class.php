@@ -1,15 +1,13 @@
 <?php
+
 # MySQL_DB.class.php
 # by Nicole Ward
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
-# Copyright (c) 2009 - Nicole Ward
-
-
+# Copyright (c) 2009 - 2014 - SnowWolfe Games, LLC
 # This file is part of DatabaseAbstractionLayer.
 # This script handles mysql database interactions.
-
 # properties:
 # $DB_Con
 # - protected
@@ -31,7 +29,7 @@
 # - protected
 # - array
 # - holds the tables for join queries
-# $Select = null;
+# $Select = \NULL;
 # $Where
 # - protected
 # - string
@@ -92,7 +90,6 @@
 # - protected
 # - resource
 # - holds the prepared statement resource
-
 #
 # methods:
 # __construct()
@@ -105,7 +102,7 @@
 # -- parameters:
 # -- $Debug
 # 		- boolean
-# 		- sets debug on (TRUE) or off (FALSE)
+# 		- sets debug on (\TRUE) or off (\FALSE)
 # -- calls:
 # 		- Sanitize()
 # SetTable()
@@ -228,8 +225,8 @@
 # - gets an instance of this class for other code
 # -- calls:
 # 		- self::construct()
-
-# select_db() - changes db
+# select_db()
+# - changes db
 # -- parameters:
 # -- $DB
 #			- string
@@ -345,10 +342,12 @@
 # -- $ResultResource
 # affected_rows()
 
-if (0 > version_compare(PHP_VERSION, '5'))
-	{
-		throw new Exception('This file was generated for PHP 5');
-	}
+namespace NS;
+
+if (0 > version_compare(\PHP_VERSION, '5'))
+{
+	throw new \Exception('This file was generated for PHP 5');
+}
 
 /**
  * include DBInterface
@@ -361,801 +360,1054 @@ require_once('DBInterface.class.php');
 
 /* user defined constants */
 
+final class MySQL_DB extends DBInterface
+{
 
-final class MySQL_DB
-			extends DBInterface
+	const DB_HOST = 'localhost';
+	const DB_USER = 'user';
+	const DB_PASS = 'pass';
+	const DB_NAME = 'db';
+
+	# \InvalidArgumentException Codes
+	const MISSING_DATA = 1;
+	const WRONG_TYPE = 2;
+	const WRONG_VALUE = 3;
+
+	protected $DB_Con = \NULL;
+	protected $Debug = \FALSE;
+	public $Debugging = \NULL;
+	protected $QueryObj = \NULL;
+	protected $AutoCommit = \NULL;
+	protected $SQL = \NULL;
+	protected $CurrentResult = \NULL;
+	protected $SQLStmt = \NULL;
+	protected $InputParams = \NULL;
+	protected $InputBindParams = \NULL;
+
+	public function __construct()
 	{
 
-		const DB_HOST = 'localhost';
-		const DB_USER = 'root';
-		const DB_PASS = '';
-		const DB_NAME = 'vintagee_gamedb';
-		protected $DB_Con = NULL;
-		protected $Debug = FALSE;
-		public $Debugging = NULL;
-		protected $QueryObj = NULL;
-		protected $AutoCommit = NULL;
-		protected $SQL = NULL;
-		protected $CurrentResult = NULL;
-		protected $SQLStmt = NULL;
-		protected $InputParams = NULL;
-		protected $InputBindParams = NULL;
+		# end __construct()
+	}
 
 
-		public function __construct()
+	public function __clone()
+	{
+		\trigger_error('Clone is not allowed.', \E_USER_ERROR);
+
+		# end clone()
+	}
+
+
+	public function __destruct()
+	{
+		$this->Close();
+
+		# end __destruct()
+	}
+
+
+	public function ResetQuery()
+	{
+		$this->QueryObj->ResetQuery();
+		$this->SQL = \NULL;
+		$this->InputParams = \NULL;
+		$this->InputBindParams = \NULL;
+		if ($this->CurrentResult)
+		{
+			$this->CloseResult();
+			unset($this->CurrentResult);
+		}
+		if ($this->SQLStmt)
+		{
+			$this->CloseStmt();
+			unset($this->SQLStmt);
+		}
+
+		# end ResetQuery()
+	}
+
+
+	public function SetDebug($Debug)
+	{
+		$this->Debug = Sanitize('boolean', $Debug);
+
+		if ($this->Debug === \TRUE)
+		{
+			$this->StartDebugging();
+		}
+
+		return $this;
+
+		# end SetDebug()
+	}
+
+
+	public function SetTable($Table, $Alias = \NULL)
+	{
+		$this->QueryObj->SetTable($Table, $Alias);
+		return $this;
+
+		# end SetTable()
+	}
+
+
+	public function SetJoinTables(Array $JoinTables)
+	{
+		$this->QueryObj->SetJoinTables($JoinTables);
+		return $this;
+
+		# end SetJoinTables()
+	}
+
+
+	public function SetLockTables(Array $LockTables)
+	{
+		$this->QueryObj->SetLockTables($LockTables);
+		return $this;
+
+		# end SetLockTables()
+	}
+
+
+	public function SetColumns(Array $Columns)
+	{
+		$this->QueryObj->SetColumns($Columns);
+		return $this;
+
+		# end SetColumns()
+	}
+
+
+	public function SetInputParams(Array $Params)
+	{
+		$this->InputParams = array();
+		foreach ($Params as $Value)
+		{
+			$Type = \gettype($Value);
+			$this->InputParams[] = Sanitize($Type, $Value);
+		}
+		return $this;
+
+		# end SetInputParams()
+	}
+
+
+	public function SetWhere(Array $Where)
+	{
+		$this->QueryObj->SetWhere($Where);
+		return $this;
+
+		# end SetWhere()
+	}
+
+
+	public function SetOrderBy($OrderBy, $Direction = \NULL)
+	{
+		$this->QueryObj->SetOrderBy($OrderBy, $Direction);
+		return $this;
+
+		# end SetOrderBy
+	}
+
+
+	public function SetGroupBy($GroupBy)
+	{
+		$this->QueryObj->SetGroupBy($GroupBy);
+		return $this;
+
+		# end SetGroupBy
+	}
+
+
+	public function SetLimit($Limit, $Offset = \NULL)
+	{
+		$this->QueryObj->SetLimit($Limit, $Offset);
+		return $this;
+
+		# end SetLimit()
+	}
+
+
+	public function SetInsertValues(Array $Values)
+	{
+		$this->QueryObj->SetInsertValues($Values);
+		return $this;
+
+		# end SetInsertValues()
+	}
+
+
+	public function SetDuplicateKey($DuplicateKey)
+	{
+		$this->QueryObj->SetDuplicateKey($DuplicateKey);
+		return $this;
+
+		# end SetDuplicateKey()
+	}
+
+
+	public function SetEngine($Engine)
+	{
+		$this->QueryObj->SetEngine($Engine);
+		return $this;
+
+		# end SetEngine()
+	}
+
+
+	protected function GetParamType($Value)
+	{
+		# get the value's type
+		$ValueType = \gettype($Value);
+
+		# assign it a prepared statement type
+		switch ($ValueType) {
+			case 'integer':
+				$ParamType = 'i';
+				break;
+			case 'double':
+				$ParamType = 'd';
+				break;
+			case 'string':
+				$ParamType = 's';
+				break;
+			default:
+				$ParamType = \FALSE;
+				break;
+		}
+
+		return $ParamType;
+
+		# end GetParamType
+	}
+
+
+	protected function StartDebugging()
+	{
+		$this->Debugging = new Logger();
+		$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
+		$this->Debugging->SetFilePath("path/to/file");
+		$LogData = 'Beginning debug log.';
+		$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
+
+		# end StartDebugging()
+	}
+
+
+	public function Connect()
+	{
+		# get our database connection
+		$this->DB_Con = new \mysqli(self::DB_HOST, self::DB_USER, self::DB_PASS, self::DB_NAME);
+
+		# check connection
+		if ($this->DB_Con->connect_errno)
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Connection'
+			. ' failed. '
+			. $this->DB_Con->connect_error, $this->DB_Con->connect_errno);
+		}
+
+		$this->DB_Con->query("SET NAMES 'utf8'");
+
+		# get our query object
+		$this->QueryObj = new MySQL_Query($this);
+		$this->QueryObj->SetDebug($this->Debug);
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Connected.';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end Connect()
+	}
+
+
+	public function Connected()
+	{
+		$returnValue = \NULL;
+		if ($this->DB_Con)
+		{
+			$returnValue = ($this->DB_Con->ping() == \TRUE)
+				? \TRUE
+				: \FALSE;
+		} else
+		{
+			$returnValue = \FALSE;
+		}
+		return $returnValue;
+
+		# end Connected
+	}
+
+
+	public function Close()
+	{
+		if ($this->DB_Con)
+		{
+			$this->DB_Con = \NULL;
+		}
+		if ($this->QueryObj)
+		{
+			$this->QueryObj = \NULL;
+		}
+
+		# end Close()
+	}
+
+
+	public function SelectDB($Database)
+	{
+		$SelectDBCheck = \NULL;
+		if (!$this->DB_Con->select_db($Database))
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Database'
+			. ' selection failed. ' . \PHP_EOL . $this->Error()
+			. \PHP_EOL . $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Select DB: ' . $Database;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end SelectDB()
+	}
+
+
+	public function ErrorNo()
+	{
+		$returnValue = $this->DB_Con->errno;
+
+		return $returnValue;
+
+		# end ErrorNo()
+	}
+
+
+	public function Error()
+	{
+		$returnValue = $this->DB_Con->error;
+
+		return $returnValue;
+
+		# end Error()
+	}
+
+
+	public function EscapeString($String)
+	{
+		$returnValue = \NULL;
+		$returnValue = $this->DB_Con->real_escape_string($String);
+		return $returnValue;
+
+		# end EscapeString()
+	}
+
+
+	public function InsertID()
+	{
+		$returnValue = $this->DB_Con->insert_id;
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $returnValue;
+
+		# end InsertID()
+	}
+
+
+	public function AutoCommit($Setting)
+	{
+		$this->DB_Con->autocommit($Setting);
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Setting: ' . $Setting;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end AutoCommit()
+	}
+
+
+	public function StartTrans()
+	{
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Table: ' . $this->Table;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end StartTrans()
+	}
+
+
+	public function RollbackTrans()
+	{
+		if (!$this->DB_Con->rollback())
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Rollback'
+			. ' failed. '
+			. $this->Error() . ' ' . $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end RollbackTrans()
+	}
+
+
+	public function CommitTrans()
+	{
+		$CommitCheck = $this->DB_Con->commit();
+
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		if ($CommitCheck === \FALSE)
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Commit'
+			. ' transaction failed. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+			. $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		return $this;
+
+		# end CommitTrans()
+	}
+
+
+	protected function PrepareQuery()
+	{
+		if (empty($this->SQL))
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $this->SQL is empty.', self::MISSING_DATA);
+		}
+
+		$this->SQLStmt = $this->DB_Con->prepare($this->SQL);
+		$PrepareCheck = (\gettype($this->SQLStmt) === 'object')
+			? \TRUE
+			: \FALSE;
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Prepare query: ';
+			$LogData .= ($PrepareCheck == \TRUE)
+				? 'Statement prepared. '
+				: 'Prepare statement failed. ';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		if ($PrepareCheck === \FALSE)
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Prepare '
+			. "query failed. " . \PHP_EOL . $this->SQL . \PHP_EOL
+			. \PHP_EOL . $this->Error() . \PHP_EOL
+			. $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		return $this;
+
+		# end PrepareQuery()
+	}
+
+
+	public function BindInputParams()
+	{
+		$returnValue = \NULL;
+		if (empty($this->InputParams) ||
+			$this->SQLStmt === \FALSE ||
+			\gettype($this->SQLStmt) !== 'object' ||
+			empty($this->SQL))
+		{
+			if (empty($this->InputParams))
 			{
-
-			} # end __construct()
-
-
-		public function __clone()
+				throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+				. ' Bind input params failed.'
+				. ' Missing input params.', self::MISSING_DATA);
+			} elseif (empty($this->SQLStmt))
 			{
-				trigger_error('Clone is not allowed.', E_USER_ERROR);
-			} # end clone()
-
-
-		public function __destruct()
+				throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+				. ' Bind input params failed.'
+				. ' Missing SQLStmt.', self::MISSING_DATA);
+			} elseif (empty($this->SQL))
 			{
-				$this->Close();
-			} # end __destruct()
+				throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+				. ' Bind input params failed.'
+				. ' Missing SQL.', self::MISSING_DATA);
+			}
+		}
+
+		$ParamTypes = \NULL;
+		$Params = array();
+
+		foreach ($this->InputParams as $Key => $Value)
+		{
+			$ParamTypes .= $this->GetParamType($Value);
+			$Params[$Key] = $Value;
+		}
+		\array_unshift($Params, $ParamTypes);
+
+		# bind input params requires arguments as references
+		# and it is enforced as of php 5.3 soooo
+		$this->InputBindParams = array();
+		foreach ($Params as $Key => &$Value)
+		{
+			$this->InputBindParams[$Key] = &$Value;
+		}
+
+		if (!\call_user_func_array(array(
+				&$this->SQLStmt,
+				'mysqli_stmt::bind_param'), $this->InputBindParams))
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Bind input'
+			. ' params failed. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+			. $this->ErrorNo() . ' '
+			. \var_export($this->InputParams, true), $this->ErrorNo());
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Input params: ' . \var_export($this->InputParams, true);
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end BindInputParams()
+	}
 
 
-		public function SetDebug($Debug)
+	public function ExecutePreparedQuery()
+	{
+		if ($this->SQLStmt === \FALSE ||
+			\gettype($this->SQLStmt) !== 'object')
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' Execute Prepared Query failed. SQLStmt not set.', self::MISSING_DATA);
+		}
+
+		if (!$this->SQLStmt->execute())
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Execute'
+			. ' prepared query failed. ' . $this->Error() . ' '
+			. $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		# if this is a select query we need to call store_result
+		if (\stripos($this->SQL, 'SELECT') !== \FALSE)
+		{
+			if (!$this->SQLStmt->store_result())
 			{
-				$this->Debug = Sanitize('boolean', $Debug);
+				throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Store'
+				. ' result failed. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+				. $this->ErrorNo(), $this->ErrorNo());
+			}
+		}
 
-				if ($this->Debug == TRUE)
-					{
-						$this->StartDebugging();
-					}
-			} # end SetDebug()
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' SQL: ' . $this->SQL;
+			$this->Debugging->WriteToLog($LogData);
+		}
 
+		return $this;
 
-		public function SetTable($Table, $Alias = NULL)
-			{
-				$this->QueryObj->SetTable($Table, $Alias);
-			} # end SetTable()
-
-
-		public function SetJoinTables(Array $Tables)
-			{
-				$this->JoinTables = $Tables;
-			} # end SetJoinTables()
+		# end ExecutePreparedQuery()
+	}
 
 
-		public function SetLockTables(Array $LockTables)
-			{
-				$this->QueryObj->SetLockTables($LockTables);
-			} # end SetLockTables()
+	public function FetchPreparedResults($ReturnFormat = 'assoc')
+	{
+		if ($this->SQLStmt === \FALSE ||
+			\gettype($this->SQLStmt) !== 'object')
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $this->SQLStmt is not set.', self::MISSING_DATA);
+		}
 
+		if ($this->NumRows() === 0)
+		{
+			return \FALSE;
+		}
 
-		public function SetColumns(Array $Columns)
-			{
-				$this->QueryObj->SetColumns($Columns);
-			} # end SetColumns()
-
-
-		public function SetWhere(Array $Where)
-			{
-				$this->QueryObj->SetWhere($Where);
-			} # end SetWhere()
-
-
-		public function SetOrderBy($OrderBy, $Direction = NULL)
-			{
-				$this->QueryObj->SetOrderBy($OrderBy, $Direction);
-			} # end SetOrderBy
-
-
-		public function SetGroupBy($GroupBy)
-			{
-				$this->QueryObj->SetGroupBy($GroupBy);
-			} # end SetGroupBy
-
-
-		public function SetLimit($Limit, $Offset = NULL)
-			{
-				$this->QueryObj->SetLimit($Limit, $Offset);
-			} # end SetLimit()
-
-
-		public function SetInsertValues(Array $Values)
-			{
-				$this->QueryObj->SetInsertValues($Values);
-			} # end SetInsertValues()
-
-
-		public function SetDuplicateKey($DuplicateKey)
-			{
-				$this->QueryObj->SetDuplicateKey($DuplicateKey);
-			} # end SetDuplicateKey()
-
-
-		public function SetEngine($Engine)
-			{
-				$this->QueryObj->SetEngine($Engine);
-			} # end SetEngine()
-
-
-		public function GetParamType($Value)
-			{
-				# get the value's type
-				$ValueType = gettype($Value);
-
-				# assign it a prepared statement type
-				switch ($ValueType) {
-					case 'integer':
-						$ReturnValue = 'i';
-						break;
-					case 'double':
-						$ReturnValue = 'd';
-						break;
-					case 'string':
-						$ReturnValue = 's';
-						break;
-					default:
-						$ReturnValue = FALSE;
-						break;
+		switch ($ReturnFormat) {
+			case 'assoc':
+				$Result = array();
+				$StmtBindCheck = $this->StmtBindAssoc($Result);
+				if ($StmtBindCheck == \FALSE)
+				{
+					throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' '
+					. 'Fetch prepared results (assoc) failed at '
+					. 'stmtbindassoc. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+					. $this->ErrorNo(), $this->ErrorNo());
 				}
-
-				return $ReturnValue;
-			} # end GetParamType
-
-
-		public function StartDebugging()
-			{
-				$this->Debugging = new Logger();
-				$this->Debugging->init('sqldebug', TRUE, 'Medium', 'Debugging', FALSE);
-				$this->Debugging->OpenLogFile();
-			} # end StartDebugging()
-
-
-		public function Connect($Database)
-			{
-				# get our database connection
-				$this->DB_Con = new mysqli(self::DB_HOST, self::DB_USER, self::DB_PASS, self::DB_NAME);
-
-				# check connection
-				if (mysqli_connect_errno())
+				if ($this->SQLStmt->fetch())
+				{
+					if ($this->Debug == \TRUE)
 					{
-						throw new DBException('Connect failed.');
-					}
-
-				$this->DB_Con->query("SET NAMES 'utf8'");
-
-				# get our query object
-				$this->QueryObj = new Mysql_Query($this);
-				if ($this->Debug == TRUE)
-					{
-						$this->QueryObj->SetDebug(TRUE);
-
-						$LogData = __FILE__.' '.__METHOD__.' Connected.';
+						$LogData = __FILE__ . ' ' . __METHOD__ . ' Fetch '
+							. 'prepared results (assoc)'
+							. \var_export($Result, true);
 						$this->Debugging->WriteToLog($LogData);
 					}
-
-				return $this->DB_Con;
-			} # end Connect()
-
-
-		public function Connected()
-			{
-				$returnValue = null;
-				if ($this->DB_Con)
-					{
-						$returnValue = ($this->DB_Con->ping() == TRUE) ? TRUE : FALSE;
-					} else {
-						$returnValue = FALSE;
-					}
-				return $returnValue;
-			} # end Connected
-
-
-		public function Close()
-			{
-				if ($this->DB_Con)
-					{
-						$this->DB_Con = NULL;
-					}
-				if ($this->QueryObj)
-					{
-						$this->QueryObj = NULL;
-					}
-			} # end Close()
-
-
-		public function SelectDB($Database)
-			{
-				$returnValue = null;
-				$returnValue = $this->DB_Con->select_db($Database);
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Select DB: '.$Database;
-						$LogData .= (!empty($returnValue)) ? 'DB selected.' : 'Select DB failed.';
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				if ($returnValue == FALSE)
-					{
-						throw new DBException('Unable to select database.');
-					}
-
-				return $returnValue;
-			} # end SelectDB()
-
-
-		public function ErrorNo()
-			{
-				$returnValue = $this->DB_Con->errno;
-
-				return $returnValue;
-			} # end ErrorNo()
-
-
-		public function Error()
-			{
-				$returnValue = $this->DB_Con->error;
-
-				return $returnValue;
-			} # end Error()
-
-
-		public function EscapeString($String)
-			{
-				$returnValue = null;
-				$returnValue = $this->DB_Con->real_escape_string($String);
-				return $returnValue;
-			} # end EscapeString()
-
-
-		public function InsertID()
-			{
-				$returnValue = $this->DB_Con->insert_id;
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				return $returnValue;
-			} # end InsertID()
-
-
-		public function AutoCommit($Setting)
-			{
-				$this->DB_Con->autocommit($Setting);
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Setting: '.$Setting;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			} # end AutoCommit()
-
-
-		public function StartTrans()
-			{
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Table: '.$this->Table;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			} # end StartTrans()
-
-
-		public function RollbackTrans()
-			{
-				$returnValue = $this->DB_Con->rollback();
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				if ($returnValue == FALSE)
-					{
-						throw new DBException('Rollback failed.');
-					}
-
-				return $returnValue;
-			} # end RollbackTrans()
-
-
-		public function CommitTrans()
-			{
-				$returnValue = $this->DB_Con->commit();
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				if ($returnValue == FALSE)
-					{
-						throw new DBException('Commit failed.');
-					}
-
-				return $returnValue;
-			} # end CommitTrans()
-
-
-		protected function PrepareQuery()
-			{
-				$returnValue = null;
-				if (empty($this->SQL))
-					{
-						return FALSE;
-					}
-
-				$this->SQLStmt = $this->DB_Con->prepare($this->SQL);
-				$returnValue = (!empty($this->SQLStmt)) ? TRUE : FALSE;
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Prepare query: ';
-						$LogData .= (!empty($this->SQLStmt)) ? 'Statement prepared.' : 'Prepare statement failed.';
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				if ($returnValue == FALSE)
-					{
-						throw new DBException('Prepare query failed.');
-					}
-
-				return $returnValue;
-			} # end PrepareQuery()
-
-
-		public function BindInputParams()
-			{
-				$returnValue = null;
-				if (empty($this->InputParams) ||
-						empty($this->SQLstmt) ||
-						empty($this->SQL))
-					{
-						return FALSE;
-					}
-
-				# bind input params requires arguments as references
-				# and it is enforced as of php 5.3 soooo
-				$this->InputBindParams = array();
-				foreach ($this->InputParams as $k => &$arg)
-					{
-						$this->InputBindParams[$k] = &$arg;
-					}
-
-				if (call_user_func_array(array(&$this->SQLstmt, 'mysqli_stmt::bind_param'), $this->InputBindParams))
-					{
-						$returnValue = TRUE;
-					} else {
-						throw new DBException('Bind input params failed.');
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Input params: '.var_export($this->InputParams, true);
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				return $returnValue;
-			} # end BindInputParams()
-
-
-		public function ExecutePreparedQuery()
-			{
-				$returnValue = null;
-				if (!$this->SQLstmt->execute())
-					{
-						throw new DBException('Execute prepared query failed.');
-					}
-
-				# if this is a select query we need to call store_result
-				if (stripos($this->SQL, 'SELECT') !== FALSE)
-					{
-						if (!$this->SQLstmt->store_result())
-							{
-								throw new DBException('Store result failed.');
-							}
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				return $returnValue;
-			} # end ExecutePreparedQuery()
-
-
-		public function FetchPreparedResults($ReturnFormat = 'assoc')
-			{
-				if ($this->SQLstmt->num_rows() > 0)
-					{
-						switch ($ReturnFormat) {
-							case 'assoc':
-								$Result = array();
-								if ($this->StmtBindAssoc($Result))
-									{
-										if ($this->SQLstmt->fetch())
-											return $Result;
-									} else {
-								if ($this->Debug == TRUE)
-									{
-										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog($LogData);
-									}
-
-										throw new DBException('Fetch prepared results (assoc) failed.');
-									}
-								break;
-							case 'object':
-								$Result = new stdClass();
-								if ($this->StmtBindObject($Result))
-									{
-										if ($this->SQLstmt->fetch())
-											return $Result;
-									} else {
-								if ($this->Debug == TRUE)
-									{
-										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog($LogData);
-									}
-
-										throw new DBException('Fetch prepared results (object) failed.');
-									}
-								break;
-							case 'array':
-							default:
-								$Result = array();
-								if ($this->StmtBindArray($Result))
-									{
-										if ($this->SQLstmt->fetch())
-											return $Result;
-									} else {
-								if ($this->Debug == TRUE)
-									{
-										$LogData = __FILE__.' '.__METHOD__.' Bind input params failed:'.var_export($this->BindParams, true);
-										$this->Debugging->WriteToLog($LogData);
-									}
-
-										throw new DBException('Fetch prepared results (arrau) failed.');
-									}
-								break;
-							}
-					} else {
-						return FALSE;
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			} # end FetchPreparedResults()
-
-
-		public function StmtBindArray(&$ReturnArr)
-			{
-				$ResultMeta = $this->SQLstmt->result_metadata();
-				if ($ResultMeta == FALSE)
-					{
-						return FALSE;
-					}
-				$FieldNames = array();
-				$ReturnArr = array();
-				$FieldNames[0] = &$this->SQLstmt;
-				$count = 1;
-
-				while ($Field = $ResultMeta->fetch_field())
-					{
-						$FieldNames[$count] =& $ReturnArr[];
-						$count++;
-					}
-
-				if (call_user_func_array('mysqli_stmt_bind_result', $FieldNames))
-					{
-						$ResultMeta->close();
-						return TRUE;
-					} else {
-						$ResultMeta->close();
-						return FALSE;
-					}
-			} # end StmtBindArray()
-
-
-		public function StmtBindAssoc(&$ReturnArr)
-			{
-				$ResultMeta = $this->SQLstmt->result_metadata();
-				if ($ResultMeta == FALSE)
-					{
-						return FALSE;
-					}
-				$FieldNames = array();
-				$ReturnArr = array();
-				$FieldNames[0] = &$this->SQLstmt;
-				$count = 1;
-
-				while ($Field = $ResultMeta->fetch_field())
-					{
-						$FieldNames[$count] =& $ReturnArr[$Field->name];
-						$count++;
-					}
-
-				if (call_user_func_array('mysqli_stmt_bind_result', $FieldNames))
-					{
-						$ResultMeta->close();
-						return TRUE;
-					} else {
-						$ResultMeta->close();
-						return FALSE;
-					}
-			} # end StmtBindAssoc()
-
-
-		public function StmtBindObject(&$ReturnObj)
-			{
-				$ResultMeta = $this->SQLstmt->result_metadata();
-				if ($ResultMeta == FALSE)
-					{
-						return FALSE;
-					}
-				$FieldNames = array();
-				$ReturnObj = new stdClass;
-				$FieldNames[0] = &$this->SQLstmt;
-				$count = 1;
-
-				while ($Field = $ResultMeta->fetch_field())
-					{
-						$fn = $Field->name;
-						$FieldNames[$count] =& $ReturnObj->$fn;
-						$count++;
-					}
-
-				if (call_user_func_array('mysqli_stmt_bind_result', $FieldNames))
-					{
-						$ResultMeta->close();
-						return TRUE;
-					} else {
-						$ResultMeta->close();
-						return FALSE;
-					}
-			} # end StmtBindObject()
-
-
-		public function CloseStmt()
-			{
-				if (!empty($this->SQLstmt))
-					{
-						$this->SQLstmt->close();
-						unset($this->SQLstmt);
-					} else {
-						$LogData = __FILE__.' '.__METHOD__.'this->SQLstmt is missing.';
-						$LogData .= var_export(debug_backtrace(), true);
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-			} # end CloseStmt()
-
-
-		protected function RunQuery()
-			{
-				$returnValue = null;
-
-				if (empty($this->SQL))
-					{
-						$returnValue = FALSE;
-					}
-
-				if ($this->CurrentResult = $this->DB_Con->query($this->SQL))
-					{
-						$returnValue = $this->CurrentResult;
-					} else {
-						throw new DBException('Run query failed.');
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' SQL: '.$this->SQL;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				return $returnValue;
-			} # end RunQuery()
-
-
-		public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM')
-			{
-				if ($this->CurrentResult->num_rows > 0)
-					{
-						switch ($ReturnFormat) {
-							case 'array':
-								switch ($ReturnArrFormat) {
-									case 'MYSQLI_NUM':
-										return $this->CurrentResult->fetch_array(MYSQLI_NUM);
-										break;
-									case 'MYSQLI_BOTH':
-										return $this->CurrentResult->fetch_array(MYSQLI_BOTH);
-										break;
-									case 'MYSQLI_ASSOC':
-									default:
-										return $this->CurrentResult->fetch_array(MYSQLI_ASSOC);
-										break;
-								}
-								break;
-							case 'object':
-								return $this->CurrentResult->fetch_object();
-								break;
-							case 'assoc':
-							default:
-								return $this->CurrentResult->fetch_assoc();
-								break;
-							}
-					} else {
-						throw new DBException('Fetch results failed.');
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			} # end FetchResults()
-
-
-		public function CloseResult()
-			{
-				if ($this->CurrentResult)
-					{
-						$this->CurrentResult->close();
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			} # end CloseResult()
-
-
-		public function NumRows()
-			{
-				$returnValue = null;
-				if (isset($this->SQLstmt))
-					{
-						$returnValue = $this->SQLstmt->num_rows();
-					} else {
-						$returnValue = $this->CurrentResult->num_rows;
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-				return $returnValue;
-			} # end NumRows()
-
-
-		public function AffectedRows()
-			{
-				$returnValue = null;
-				if (isset($this->SQLstmt))
-					{
-						$returnValue = $this->SQLstmt->affected_rows;
-					} else {
-						$returnValue = $this->DB_Con->affected_rows;
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__;
-						$this->Debugging->WriteToLog($LogData);
-					}
-
-			return $returnValue;
-			} # end AffectedRows()
-
-
-		public function Query($QueryType = NULL, $RunAs = 'Standard')
-			{
-				if (empty($QueryType))
-					{
-						# throw an exception
-					}
-				$returnValue = NULL;
-
-				$this->QueryObj->SetQuery($QueryType);
-				$this->SQL = $this->QueryObj->GetSQL();
-
-				switch ($QueryType) {
-					case 'SELECT':
-					case 'SHOW TABLES':
-					case 'SHOW COLUMNS':
-					case 'DESCRIBE':
-					case 'EXPLAIN':
-						# these return a result set
-						switch ($RunAs) {
-							case 'Standard':
-								$this->CurrentResult = $this->RunQuery();
-								$returnValue = $this->CurrentResult;
-								break;
-							case 'Prepared':
-								$this->SQLstmt =$this->PrepareQuery();
-								$returnValue = $this->SQLStmt;
-								break;
-						}
-						break;
-					case 'INSERT':
-					case 'UPDATE':
-					case 'DELETE':
-					case 'ALTER TABLE':
-					case 'OPTIMIZE TABLE':
-					case 'TRUNCATE TABLE':
-					case 'CREATE TEMPORARY TABLE':
-					case 'DROP TEMPORARY TABLE':
-					case 'LOCK TABLES':
-					case 'UNLOCK TABLES':
-						# these do not return result sets
-						switch ($RunAs) {
-							case 'Standard':
-								$returnValue = $this->RunQuery();
-								break;
-							case 'Prepared':
-								$this->SQLstmt =$this->PrepareQuery();
-								$returnValue = $this->SQLStmt;
-								break;
-						}
-						break;
+					return $Result;
 				}
-
-				if ($returnValue == FALSE)
+				break;
+			case 'object':
+				$Result = new \stdClass();
+				$StmtBindCheck = $this->StmtBindObject($Result);
+				if ($StmtBindCheck == \FALSE)
+				{
+					throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' '
+					. 'Fetch prepared results (object) failed at '
+					. 'stmtbindobject. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+					. $this->ErrorNo(), $this->ErrorNo());
+				}
+				if ($this->SQLStmt->fetch())
+				{
+					if ($this->Debug == \TRUE)
 					{
-						throw new DBException('Optimize failed.');
-					}
-
-				if ($this->Debug == TRUE)
-					{
-						$LogData = __FILE__.' '.__METHOD__.' Query type: '.$QueryType.' Run as: '.$RunAs;
+						$LogData = __FILE__ . ' ' . __METHOD__ . ' Fetch '
+							. 'prepared results (object)'
+							. \var_export($Result, true);
 						$this->Debugging->WriteToLog($LogData);
 					}
-
-				return $returnValue;
-			} # end Query()
-
-		public function ShowTables()
-			{
-				$this->SQL = "\n"
-					."SHOW TABLES";
-
-				if ($this->Debug == TRUE)
+					return $Result;
+				}
+				break;
+			case 'array':
+			default:
+				$Result = array();
+				$StmtBindCheck = $this->StmtBindArray($Result);
+				if ($StmtBindCheck == \FALSE)
+				{
+					throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' '
+					. 'Fetch prepared results (array) failed at '
+					. 'stmtbindarray. ' . \PHP_EOL . $this->Error() . \PHP_EOL
+					. $this->ErrorNo(), $this->ErrorNo());
+				}
+				if ($this->SQLStmt->fetch())
+				{
+					if ($this->Debug == \TRUE)
 					{
-						$LogData = __FILE__.' '.__METHOD__;
+						$LogData = __FILE__ . ' ' . __METHOD__ . ' Fetch '
+							. 'prepared results (array)'
+							. \var_export($Result, true);
 						$this->Debugging->WriteToLog($LogData);
 					}
+					return $Result;
+				}
+				break;
+		}
 
-				if ($returnValue == FALSE)
-					{
-						throw new DBException('Commit failed.');
+		# end FetchPreparedResults()
+	}
+
+
+	protected function StmtBindArray(&$ReturnArr)
+	{
+		$ResultMeta = $this->SQLStmt->result_metadata();
+		if ($ResultMeta == \FALSE)
+		{
+			return \FALSE;
+		}
+		$FieldNames = array();
+		$ReturnArr = array();
+		$FieldNames[0] = &$this->SQLStmt;
+		$count = 1;
+
+		while ($Field = $ResultMeta->fetch_field())
+		{
+			$FieldNames[$count] = & $ReturnArr[];
+			$count++;
+		}
+
+		$StmtBindCheck = \call_user_func_array('mysqli_stmt_bind_result', $FieldNames);
+		$ResultMeta->close();
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Binding result array ';
+			$LogData .= (!empty($StmtBindCheck))
+				? 'succeeded.'
+				: 'failed.';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $StmtBindCheck;
+
+		# end StmtBindArray()
+	}
+
+
+	protected function StmtBindAssoc(&$ReturnArr)
+	{
+		$ResultMeta = $this->SQLStmt->result_metadata();
+		if ($ResultMeta == \FALSE)
+		{
+			return \FALSE;
+		}
+		$FieldNames = array();
+		$ReturnArr = array();
+		$FieldNames[0] = &$this->SQLStmt;
+		$count = 1;
+
+		while ($Field = $ResultMeta->fetch_field())
+		{
+			$FieldNames[$count] = & $ReturnArr[$Field->name];
+			$count++;
+		}
+
+		$StmtBindCheck = \call_user_func_array('mysqli_stmt_bind_result', $FieldNames);
+		$ResultMeta->close();
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Binding result assoc ';
+			$LogData .= (!empty($StmtBindCheck))
+				? 'succeeded.'
+				: 'failed.';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $StmtBindCheck;
+
+		# end StmtBindAssoc()
+	}
+
+
+	protected function StmtBindObject(&$ReturnObj)
+	{
+		$ResultMeta = $this->SQLStmt->result_metadata();
+		if ($ResultMeta == \FALSE)
+		{
+			return \FALSE;
+		}
+		$FieldNames = array();
+		$ReturnObj = new \stdClass;
+		$FieldNames[0] = &$this->SQLStmt;
+		$count = 1;
+
+		while ($Field = $ResultMeta->fetch_field())
+		{
+			$fn = $Field->name;
+			$FieldNames[$count] = & $ReturnObj->$fn;
+			$count++;
+		}
+
+		$StmtBindCheck = \call_user_func_array('mysqli_stmt_bind_result', $FieldNames);
+		$ResultMeta->close();
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Binding result object ';
+			$LogData .= (!empty($StmtBindCheck))
+				? 'succeeded.'
+				: 'failed.';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $StmtBindCheck;
+
+		# end StmtBindObject()
+	}
+
+
+	public function CloseStmt()
+	{
+		if (!empty($this->SQLStmt))
+		{
+			$this->SQLStmt->close();
+			unset($this->SQLStmt);
+		}
+
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end CloseStmt()
+	}
+
+
+	protected function RunQuery($QueryType)
+	{
+		if (empty($this->SQL))
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $this->SQL is empty. ', self::MISSING_DATA);
+		}
+
+		switch ($QueryType) {
+			case 'SELECT':
+			case 'SHOW TABLES':
+			case 'SHOW COLUMNS':
+			case 'DESCRIBE':
+			case 'EXPLAIN':
+				# these return a result set
+				if (!$this->CurrentResult = $this->DB_Con->query($this->SQL))
+				{
+					throw new \DBException(__FILE__ . ' ' . __METHOD__
+					. ' run query failed. ' . \PHP_EOL . $this->Error()
+					. \PHP_EOL . $this->SQL
+					. \PHP_EOL . $this->ErrorNo(), $this->ErrorNo());
+				}
+				break;
+			case 'INSERT':
+			case 'UPDATE':
+			case 'DELETE':
+			case 'ALTER TABLE':
+			case 'OPTIMIZE TABLE':
+			case 'TRUNCATE TABLE':
+			case 'CREATE TEMPORARY TABLE':
+			case 'DROP TEMPORARY TABLE':
+			case 'LOCK TABLES':
+			case 'UNLOCK TABLES':
+				# these do not return result sets
+				if (!$this->DB_Con->query($this->SQL))
+				{
+					throw new \DBException(__FILE__ . ' ' . __METHOD__
+					. ' run query failed. ' . \PHP_EOL . $this->Error()
+					. \PHP_EOL . $this->SQL
+					. \PHP_EOL . $this->ErrorNo(), $this->ErrorNo());
+				}
+				break;
+			default:
+				throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+				. ' Unknown query type. ', self::WRONG_VALUE);
+				break;
+		}
+
+		if ($this->Debug == \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' SQL: ' . $this->SQL;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end RunQuery()
+	}
+
+
+	public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM')
+	{
+		if (empty($this->CurrentResult))
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $this->CurrentResult is not set/empty.', self::MISSING_DATA);
+		}
+
+		$ResultCheck = (\gettype($this->CurrentResult) === 'object')
+			? \TRUE
+			: \FALSE;
+
+		if ($ResultCheck === \FALSE)
+		{
+			throw new \DBException(__FILE__ . ' ' . __METHOD__ . ' Cannot fetch'
+			. ' results because CurrentResults is not an object. '
+			. \PHP_EOL . $this->Error() . \PHP_EOL
+			. $this->ErrorNo(), $this->ErrorNo());
+		}
+
+		if ($this->NumRows() > 0)
+		{
+			switch ($ReturnFormat) {
+				case 'array':
+					switch ($ReturnArrFormat) {
+						case 'MYSQLI_NUM':
+							return $this->CurrentResult->fetch_array(\MYSQLI_NUM);
+							break;
+						case 'MYSQLI_BOTH':
+							return $this->CurrentResult->fetch_array(\MYSQLI_BOTH);
+							break;
+						case 'MYSQLI_ASSOC':
+						default:
+							return $this->CurrentResult->fetch_array(\MYSQLI_ASSOC);
+							break;
 					}
+					break;
+				case 'object':
+					return $this->CurrentResult->fetch_object();
+					break;
+				case 'assoc':
+				default:
+					return $this->CurrentResult->fetch_assoc();
+					break;
+			}
+		} else
+		{
+			return \NULL;
+		}
 
-			} # end ShowTables()
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
 
-	} /* end of final class MySQL_DB */
+		# end FetchResults()
+	}
 
-?>
+
+	public function CloseResult()
+	{
+		if ($this->CurrentResult)
+		{
+			$this->CurrentResult->close();
+			unset($this->CurrentResult);
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end CloseResult()
+	}
+
+
+	public function NumRows()
+	{
+		$returnValue = \NULL;
+		if (isset($this->SQLStmt))
+		{
+			$returnValue = $this->SQLStmt->num_rows;
+		} else
+		{
+			$returnValue = $this->CurrentResult->num_rows;
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . 'Number of rows: ' . $returnValue;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $returnValue;
+
+		# end NumRows()
+	}
+
+
+	public function AffectedRows()
+	{
+		$returnValue = \NULL;
+		if (isset($this->SQLStmt))
+		{
+			$returnValue = $this->SQLStmt->affected_rows;
+		} else
+		{
+			$returnValue = $this->DB_Con->affected_rows;
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . 'Number of affected '
+				. 'rows: ' . $returnValue;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $returnValue;
+
+		# end AffectedRows()
+	}
+
+
+	public function Query($QueryType = \NULL, $RunAs = 'Standard')
+	{
+		if (empty($QueryType))
+		{
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $QueryType is not set/empty. ', self::MISSING_DATA);
+		}
+
+		try {
+			$this->QueryObj->SetQuery($QueryType);
+		} catch (\InvalidArgumentException $exc) {
+			throw $exc;
+		} catch (\Exception $exc) {
+			throw $exc;
+		}
+		$this->SQL = $this->QueryObj->GetSQL();
+		try {
+			switch ($RunAs) {
+				case 'Standard':
+					$this->RunQuery($QueryType);
+					break;
+				case 'Prepared':
+					$this->PrepareQuery();
+					break;
+			}
+		} catch (\InvalidArgumentException $exc) {
+			throw $exc;
+		} catch (\DBException $exc) {
+			throw $exc;
+		} catch (\Exception $exc) {
+			throw $exc;
+		}
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Query type: '
+				. $QueryType . ' Run as: ' . $RunAs;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
+
+		# end Query()
+	}
+
+
+	public function ShowTables()
+	{
+		$this->SQL = "\n"
+			. "SHOW TABLES";
+
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__;
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		if ($returnValue == \FALSE)
+		{
+			throw new \DBException('Commit failed.');
+		}
+	}
+
+
+# end ShowTables()
+}
+
+/* end of final class MySQL_DB */

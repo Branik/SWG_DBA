@@ -1,14 +1,13 @@
 <?php
+
 # QueryInterface.class.php
 # by Nicole Ward
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
 # Copyright © 2009 - 2013 - SnowWolfe Games, LLC
-
 # This file is part of DatabaseAbstractionLayer.
 # This script handles mysql database interactions.
-
 # methods:
 # __construct()
 # -- parameters:
@@ -270,96 +269,100 @@
 # - calls:
 # - Logger::WriteToLog
 
+namespace ER;
+
 if (0 > version_compare(PHP_VERSION, '5'))
-	{
-		throw new Exception('This file was generated for PHP 5');
-	}
+{
+	throw new Exception('This file was generated for PHP 5');
+}
 
 abstract class QueryInterface
-	{
-		abstract public function __construct($DB_Con);
+{
 
-		abstract public function __clone();
+	abstract public function __construct($DB_Con);
 
-		abstract public function __destruct();
+	abstract public function __clone();
 
-		abstract public function StartDebugging();
+	abstract public function __destruct();
 
-		abstract public function ResetQuery();
+	abstract public function StartDebugging();
 
-		abstract public function SetDebug($Debug);
+	abstract public function ResetQuery();
 
-		abstract public function SetQuery($QueryType);
+	abstract public function SetDebug($Debug);
 
-		abstract public function SetTable($Table, $Alias = NULL);
+	abstract public function SetQuery($QueryType);
 
-		abstract public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement);
+	abstract public function SetTable($Table, $Alias = NULL);
 
-		abstract public function SetColumns(Array $Columns);
+	abstract public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement, $JoinAlias = NULL);
 
-		abstract public function SetWhere(Array $Where);
+	abstract public function SetColumns(Array $Columns);
 
-		abstract public function SetOrderBy($OrderBy, $Direction = NULL);
+	abstract public function SetWhere(Array $Where);
 
-		abstract public function SetGroupBy($GroupBy);
+	abstract public function SetOrderBy($OrderBy, $Direction = NULL);
 
-		abstract public function SetLimit($Limit, $Offset = NULL);
+	abstract public function SetGroupBy($GroupBy);
 
-		abstract public function GetSQL();
+	abstract public function SetLimit($Limit, $Offset = NULL);
 
-		abstract public function BuildSelectQuery();
+	abstract public function GetSQL();
 
-		abstract public function BuildUpdateQuery();
+	abstract public function BuildSelectQuery();
 
-		abstract public function BuildInsertQuery();
+	abstract public function BuildUpdateQuery();
 
-		abstract public function BuildDeleteQuery();
+	abstract public function BuildInsertQuery();
 
-		abstract public function BuildAlterQuery();
+	abstract public function BuildDeleteQuery();
 
-		abstract public function BuildTruncateQuery();
+	abstract public function BuildAlterQuery();
 
-		abstract public function BuildOptimizeQuery();
+	abstract public function BuildTruncateQuery();
 
-		abstract public function BuildShowColumnsQuery();
+	abstract public function BuildOptimizeQuery();
 
-		abstract public function BuildShowTablesQuery();
+	abstract public function BuildShowColumnsQuery();
 
-		abstract public function BuildCreateTemporaryQuery();
+	abstract public function BuildShowTablesQuery();
 
-		abstract public function BuildDropTemporaryQuery();
+	abstract public function BuildCreateTemporaryQuery();
 
-		abstract public function BuildLockTablesQuery();
+	abstract public function BuildDropTemporaryQuery();
 
-		abstract public function BuildUnlockTablesQuery();
+	abstract public function BuildLockTablesQuery();
 
-		abstract protected function BuildSelectClause();
+	abstract public function BuildUnlockTablesQuery();
 
-		abstract protected function BuildUpdateClause();
+	abstract protected function BuildSelectClause();
 
-		abstract protected function BuildInsertClause();
+	abstract protected function BuildUpdateClause();
 
-		abstract protected function BuildOnDuplicateKeyClause();
+	abstract protected function BuildInsertClause();
 
-		abstract protected function BuildDeleteClause();
+	abstract protected function BuildOnDuplicateKeyClause();
 
-		abstract protected function BuildAlterClause();
+	abstract protected function BuildDeleteClause();
 
-		abstract protected function BuildCreateTemporaryClause();
+	abstract protected function BuildAlterClause();
 
-		abstract protected function BuildTableClause($QueryType);
+	abstract protected function BuildCreateTemporaryClause();
 
-		abstract protected function BuildJoinClause();
+	abstract protected function BuildTableClause($QueryType);
 
-		abstract protected function BuildWhereClause();
+	abstract protected function BuildJoinClause();
 
-		abstract protected function BuildOrderByClause();
+	abstract protected function BuildWhereClause();
 
-		abstract protected function BuildLimitClause();
+	abstract protected function BuildOrderByClause();
 
-		abstract protected function BuildLockTablesClause();
+	abstract protected function BuildLimitClause();
 
-		abstract protected function BuildEngineClause();
+	abstract protected function BuildLockTablesClause();
 
-	} # end QueryInterface interface
+	abstract protected function BuildEngineClause();
+}
+
+# end QueryInterface interface
 ?>

@@ -1,14 +1,13 @@
 <?php
+
 # DBInterface.class.php
 # by Nicole Ward
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
-# Copyright © 2009 - 2013 - SnowWolfe Games, LLC
-
+# Copyright ï¿½ 2009 - 2014 - SnowWolfe Games, LLC
 # This file is part of DatabaseAbstractionLayer.
 # This script sets the interface for the DB controls
-
 #
 # methods:
 # __construct()
@@ -144,7 +143,6 @@
 # - gets an instance of this class for other code
 # -- calls:
 # 		- self::construct()
-
 # select_db() - changes db
 # -- parameters:
 # -- $DB
@@ -261,104 +259,108 @@
 # -- $ResultResource
 # affected_rows()
 
+namespace ER;
+
 if (0 > version_compare(PHP_VERSION, '5'))
-	{
-		throw new Exception('This file was generated for PHP 5');
-	}
+{
+	throw new Exception('This file was generated for PHP 5');
+}
 
 /* user defined includes */
 
 /* user defined constants */
 
-
 abstract class DBInterface
-	{
-		abstract public function __construct();
+{
 
-		abstract public function __clone();
+	abstract public function __construct();
 
-		abstract public function __destruct();
+	abstract public function __clone();
 
-		abstract public function SetDebug($Debug);
+	abstract public function __destruct();
 
-		abstract public function SetTable($Table, $Alias = NULL);
+	abstract public function SetDebug($Debug);
 
-		abstract public function SetJoinTables(Array $Tables);
+	abstract public function SetTable($Table, $Alias = NULL);
 
-		abstract public function SetLockTables(Array $LockTables);
+	abstract public function SetJoinTables(Array $Tables);
 
-		abstract public function SetColumns(Array $Columns);
+	abstract public function SetLockTables(Array $LockTables);
 
-		abstract public function SetWhere(Array $Where);
+	abstract public function SetColumns(Array $Columns);
 
-		abstract public function SetOrderBy($OrderBy, $Direction = NULL);
+	abstract public function SetWhere(Array $Where);
 
-		abstract public function SetGroupBy($GroupBy);
+	abstract public function SetOrderBy($OrderBy, $Direction = NULL);
 
-		abstract public function SetLimit($Limit, $Offset = NULL);
+	abstract public function SetGroupBy($GroupBy);
 
-		abstract public function SetInsertValues(Array $Values);
+	abstract public function SetLimit($Limit, $Offset = NULL);
 
-		abstract public function SetDuplicateKey($DuplicateKey);
+	abstract public function SetInsertValues(Array $Values);
 
-		abstract public function SetEngine($Engine);
+	abstract public function SetDuplicateKey($DuplicateKey);
 
-		abstract public function GetParamType($Value);
+	abstract public function SetEngine($Engine);
 
-		abstract public function StartDebugging();
+	abstract protected function GetParamType($Value);
 
-		abstract public function Connect($Database);
+	abstract protected function StartDebugging();
 
-		abstract public function Connected();
+	abstract public function Connect();
 
-		abstract public function Close();
+	abstract public function Connected();
 
-		abstract public function SelectDB($Database);
+	abstract public function Close();
 
-		abstract public function ErrorNo();
+	abstract public function SelectDB($Database);
 
-		abstract public function Error();
+	abstract public function ErrorNo();
 
-		abstract public function EscapeString($String);
+	abstract public function Error();
 
-		abstract public function InsertID();
+	abstract public function EscapeString($String);
 
-		abstract public function AutoCommit($Setting);
+	abstract public function InsertID();
 
-		abstract public function StartTrans();
+	abstract public function AutoCommit($Setting);
 
-		abstract public function RollbackTrans();
+	abstract public function StartTrans();
 
-		abstract public function CommitTrans();
+	abstract public function RollbackTrans();
 
-		abstract protected function PrepareQuery();
+	abstract public function CommitTrans();
 
-		abstract public function BindInputParams();
+	abstract protected function PrepareQuery();
 
-		abstract public function ExecutePreparedQuery();
+	abstract public function BindInputParams();
 
-		abstract public function FetchPreparedResults($ReturnFormat = 'assoc');
+	abstract public function ExecutePreparedQuery();
 
-		abstract public function StmtBindArray(&$ReturnArr);
+	abstract public function FetchPreparedResults($ReturnFormat = 'assoc');
 
-		abstract public function StmtBindAssoc(&$ReturnArr);
+	abstract protected function StmtBindArray(&$ReturnArr);
 
-		abstract public function StmtBindObject(&$ReturnObj);
+	abstract protected function StmtBindAssoc(&$ReturnArr);
 
-		abstract public function CloseStmt();
+	abstract protected function StmtBindObject(&$ReturnObj);
 
-		abstract protected function RunQuery();
+	abstract public function CloseStmt();
 
-		abstract public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
+	abstract protected function RunQuery($QueryType);
 
-		abstract public function CloseResult();
+	abstract public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
 
-		abstract public function NumRows();
+	abstract public function CloseResult();
 
-		abstract public function AffectedRows();
+	abstract public function NumRows();
 
-		abstract public function Query($QueryType = NULL, $RunAs = 'Standard');
+	abstract public function AffectedRows();
 
-		abstract public function ShowTables();
-	} # end of interface DBInterface
+	abstract public function Query($QueryType = NULL, $RunAs = 'Standard');
+
+	abstract public function ShowTables();
+}
+
+# end of interface DBInterface
 ?>
