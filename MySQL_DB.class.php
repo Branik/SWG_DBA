@@ -344,7 +344,7 @@
 
 namespace NS;
 
-if (0 > version_compare(\PHP_VERSION, '5'))
+if (0 > \version_compare(\PHP_VERSION, '5'))
 {
 	throw new \Exception('This file was generated for PHP 5');
 }
@@ -587,7 +587,7 @@ final class MySQL_DB extends DBInterface
 	{
 		$this->Debugging = new Logger();
 		$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
-		$this->Debugging->SetFilePath("path/to/file");
+		$this->Debugging->SetFilePath(ER_OTHER_LOG);
 		$LogData = 'Beginning debug log.';
 		$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
 

@@ -361,7 +361,7 @@
 
 namespace NS;
 
-if (0 > version_compare(\PHP_VERSION, '5'))
+if (0 > \version_compare(\PHP_VERSION, '5'))
 {
 	throw new \Exception('This file was generated for PHP 5');
 }
@@ -477,7 +477,6 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetDebug($Debug)
 	{
-		HandleError('called ' . __METHOD__);
 		$this->Debug = Sanitize('boolean', $Debug);
 
 		if ($this->Debug === \TRUE)
@@ -642,7 +641,7 @@ final class MySQL_Query extends QueryInterface
 		{
 			if (empty($Value['JoinAlias']))
 			{
-				$Value['JoinAlias'] = NULL;
+				$Value['JoinAlias'] = \NULL;
 			}
 			$this->SetJoinTable($Value['JoinType'], $Value['JoinTable'], $Value['JoinMethod'], $Value['JoinStatement'], $Value['JoinAlias']);
 		}
@@ -656,7 +655,7 @@ final class MySQL_Query extends QueryInterface
 	}
 
 
-	public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement, $JoinAlias = NULL)
+	public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement, $JoinAlias = \NULL)
 	{
 		$this->JoinType[] = Sanitize('string', $JoinType);
 		$this->JoinTable[] = Sanitize('string', $JoinTable);
@@ -923,7 +922,7 @@ final class MySQL_Query extends QueryInterface
 			throw $exc;
 		}
 		$this->SQL .= $this->BuildInsertClause();
-		if (is_array($this->DuplicateKey))
+		if (\is_array($this->DuplicateKey))
 		{
 			$this->SQL .= $this->BuildOnDuplicateKeyClause();
 		}
@@ -1141,14 +1140,14 @@ final class MySQL_Query extends QueryInterface
 
 		foreach ($this->Columns as $FieldArray)
 		{
-			if (!\empty($FieldArray['SQLFunction']))
+			if (!empty($FieldArray['SQLFunction']))
 			{
 				$SelectClause .= $FieldArray['SQLFunction'] . "(";
-				if (!\empty($FieldArray['Distinct']))
+				if (!empty($FieldArray['Distinct']))
 				{
 					$SelectClause .= "DISTINCT ";
 				}
-				if (!\empty($FieldArray['If']))
+				if (!empty($FieldArray['If']))
 				{
 					$SelectClause .= "IF(";
 					$SelectClause .= ($FieldArray['Table'])
@@ -1165,7 +1164,7 @@ final class MySQL_Query extends QueryInterface
 					{
 						$SelectClause .= ', ' . $FieldArray['FormatLevel']
 							. ')';
-					} elseif (!\empty($FieldArray['CastType']))
+					} elseif (!empty($FieldArray['CastType']))
 					{
 						$SelectClause .= ' AS ' . $FieldArray['CastType']
 							. ')';
@@ -1225,7 +1224,7 @@ final class MySQL_Query extends QueryInterface
 				? '`' . $FieldArray['Table'] . '`.'
 				: '';
 			$UpdateClause .= '`' . $FieldArray['Field'] . "` = ";
-			if (\isset($FieldArray['Value']))
+			if (isset($FieldArray['Value']))
 			{
 				$Value = $this->DB_Con->EscapeString($FieldArray['Value']);
 				if (\is_numeric($Value) ||
@@ -1237,7 +1236,7 @@ final class MySQL_Query extends QueryInterface
 				{
 					$UpdateClause .= "'" . $Value . "', ";
 				}
-			} elseif (!\empty($FieldArray['Maths']))
+			} elseif (!empty($FieldArray['Maths']))
 			{
 				$UpdateClause .= ' `' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'];
 			} else
@@ -1504,8 +1503,8 @@ final class MySQL_Query extends QueryInterface
 			$WhereClause .= ($Arguments['SecondOperandTable'])
 				? '`' . $Arguments['SecondOperandTable'] . '`.'
 				: '';
-			$WhereClause .= (!\empty($Arguments['SecondOperand']))
-				? (!\empty($Arguments['isAField_Second']))
+			$WhereClause .= (!empty($Arguments['SecondOperand']))
+				? (!empty($Arguments['isAField_Second']))
 					? "`" . $this->DB_Con->EscapeString($Arguments['SecondOperand']) . "`"
 					: (\is_numeric($Arguments['SecondOperand']))
 						? $this->DB_Con->EscapeString($Arguments['SecondOperand'])
