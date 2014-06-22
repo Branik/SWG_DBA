@@ -361,7 +361,7 @@
 
 namespace NS;
 
-if (0 > \version_compare(\PHP_VERSION, '5'))
+if (0 > \version_compare(PHP_VERSION, '5'))
 {
 	throw new \Exception('This file was generated for PHP 5');
 }
@@ -470,7 +470,6 @@ final class MySQL_Query extends QueryInterface
 		$this->DuplicateKey = \NULL;
 		$this->Engine = \NULL;
 		$this->SQL = \NULL;
-
 		# end ResetQuery()
 	}
 
@@ -1182,7 +1181,9 @@ final class MySQL_Query extends QueryInterface
 				$SelectClause .= ($FieldArray['Table'])
 					? '`' . $FieldArray['Table'] . '`.'
 					: '';
-				$SelectClause .= '`' . $FieldArray['Field'] . '`';
+				$SelectClause .= ($FieldArray['Field'] === '*')
+					? $FieldArray['Field']
+					: '`' . $FieldArray['Field'] . '`';
 			}
 
 			if (!empty($FieldArray['Maths']))
@@ -1229,7 +1230,7 @@ final class MySQL_Query extends QueryInterface
 				$Value = $this->DB_Con->EscapeString($FieldArray['Value']);
 				if (\is_numeric($Value) ||
 					\is_bool($Value) ||
-					!\empty($FieldArray['isSQLFunction']))
+					!empty($FieldArray['isSQLFunction']))
 				{
 					$UpdateClause .= $Value . ', ';
 				} else
@@ -1465,7 +1466,7 @@ final class MySQL_Query extends QueryInterface
 		$JoinTablesClause = '';
 		foreach ($this->JoinType AS $Key => $Value)
 		{
-			$JoinTablesClause .= $Value . ' JOIN ' . $this->JoinTable[$Key] . ' ';
+			$JoinTablesClause .= $Value . ' JOIN `' . $this->JoinTable[$Key] . '` ';
 			if (!empty($this->JoinAlias[$Key]))
 			{
 				$JoinTablesClause .= 'AS ' . $this->JoinAlias[$Key] . ' ';

@@ -259,7 +259,7 @@
 # -- $ResultResource
 # affected_rows()
 
-namespace ER;
+namespace NS;
 
 if (0 > version_compare(PHP_VERSION, '5'))
 {
@@ -363,4 +363,3 @@ abstract class DBInterface
 }
 
 # end of interface DBInterface
-?>

@@ -269,7 +269,7 @@
 # - calls:
 # - Logger::WriteToLog
 
-namespace ER;
+namespace NS;
 
 if (0 > version_compare(PHP_VERSION, '5'))
 {
@@ -365,4 +365,3 @@ abstract class QueryInterface
 }
 
 # end QueryInterface interface
-?>

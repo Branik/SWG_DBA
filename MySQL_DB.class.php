@@ -413,16 +413,6 @@ final class MySQL_DB extends DBInterface
 		$this->SQL = \NULL;
 		$this->InputParams = \NULL;
 		$this->InputBindParams = \NULL;
-		if ($this->CurrentResult)
-		{
-			$this->CloseResult();
-			unset($this->CurrentResult);
-		}
-		if ($this->SQLStmt)
-		{
-			$this->CloseStmt();
-			unset($this->SQLStmt);
-		}
 
 		# end ResetQuery()
 	}
@@ -587,7 +577,7 @@ final class MySQL_DB extends DBInterface
 	{
 		$this->Debugging = new Logger();
 		$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
-		$this->Debugging->SetFilePath(ER_OTHER_LOG);
+		$this->Debugging->SetFilePath(OTHER_LOG);
 		$LogData = 'Beginning debug log.';
 		$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
 
@@ -1220,7 +1210,7 @@ final class MySQL_DB extends DBInterface
 	{
 		if (empty($this->CurrentResult))
 		{
-			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			throw new \Exception(__FILE__ . ' ' . __METHOD__
 			. ' $this->CurrentResult is not set/empty.', self::MISSING_DATA);
 		}
 
