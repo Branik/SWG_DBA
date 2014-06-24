@@ -575,11 +575,16 @@ final class MySQL_DB extends DBInterface
 
 	protected function StartDebugging()
 	{
-		$this->Debugging = new Logger();
-		$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
-		$this->Debugging->SetFilePath(OTHER_LOG);
-		$LogData = 'Beginning debug log.';
-		$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
+		try {
+			$this->Debugging = new Logger();
+			$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
+			$this->Debugging->SetFilePath(OTHER_LOG);
+			$LogData = 'Beginning debug log.';
+			$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
+		} catch (Exception $exc) {
+			throw $exc;
+		}
+
 
 		# end StartDebugging()
 	}

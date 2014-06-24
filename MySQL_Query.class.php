@@ -705,7 +705,10 @@ final class MySQL_Query extends QueryInterface
 	{
 		foreach ($Where as $Value)
 		{
-			$Value['SecondOperand'] = Sanitize('string', $Value['SecondOperand']);
+			if (!empty($Value['SecondOperand']))
+			{
+				$Value['SecondOperand'] = Sanitize('string', $Value['SecondOperand']);
+			}
 		}
 		$this->Where = $Where;
 		if ($this->Debug === \TRUE)
@@ -1149,13 +1152,13 @@ final class MySQL_Query extends QueryInterface
 				if (!empty($FieldArray['If']))
 				{
 					$SelectClause .= "IF(";
-					$SelectClause .= ($FieldArray['Table'])
+					$SelectClause .= (!empty($FieldArray['Table']))
 						? '`' . $FieldArray['Table'] . '`.'
 						: '';
 					$SelectClause .= "`" . $FieldArray['Field'] . "` = " . $FieldArray['If'] . "))";
 				} else
 				{
-					$SelectClause .= ($FieldArray['Table'])
+					$SelectClause .= (!empty($FieldArray['Table']))
 						? '`' . $FieldArray['Table'] . '`.'
 						: '';
 					$SelectClause .= '`' . $FieldArray['Field'] . '`';
@@ -1178,7 +1181,7 @@ final class MySQL_Query extends QueryInterface
 				{
 					$SelectClause .= "DISTINCT ";
 				}
-				$SelectClause .= ($FieldArray['Table'])
+				$SelectClause .= (!empty($FieldArray['Table']))
 					? '`' . $FieldArray['Table'] . '`.'
 					: '';
 				$SelectClause .= ($FieldArray['Field'] === '*')
@@ -1221,7 +1224,7 @@ final class MySQL_Query extends QueryInterface
 
 		foreach ($this->Columns as $FieldArray)
 		{
-			$UpdateClause .= ($FieldArray['Table'])
+			$UpdateClause .= (!empty($FieldArray['Table']))
 				? '`' . $FieldArray['Table'] . '`.'
 				: '';
 			$UpdateClause .= '`' . $FieldArray['Field'] . "` = ";
@@ -1239,7 +1242,7 @@ final class MySQL_Query extends QueryInterface
 				}
 			} elseif (!empty($FieldArray['Maths']))
 			{
-				$UpdateClause .= ' `' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'];
+				$UpdateClause .= ' `' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'] . ', ';
 			} else
 			{
 				$UpdateClause .= "?, ";
@@ -1274,9 +1277,9 @@ final class MySQL_Query extends QueryInterface
 		}
 		$TrimmedFields = \rtrim($Fields, ", ");
 		$TrimmedFields .= ')';
-		if (isset($this->Values))
+		if (isset($this->InsertValues))
 		{
-			foreach ($this->Values as $ValuesArray)
+			foreach ($this->InsertValues as $ValuesArray)
 			{
 				foreach ($ValuesArray as $Value)
 				{
@@ -1302,8 +1305,8 @@ final class MySQL_Query extends QueryInterface
 			$TrimmedAllValues = '(' . $TrimmedValues . ')';
 		}
 
-		$InsertClause = $Fields;
-		if (!empty($Values))
+		$InsertClause = $TrimmedFields;
+		if (!empty($TrimmedAllValues))
 		{
 			$InsertClause .= ' VALUES ' . $TrimmedAllValues;
 		}
@@ -1491,17 +1494,17 @@ final class MySQL_Query extends QueryInterface
 		$WhereClause = 'WHERE ';
 		foreach ($this->Where as $Arguments)
 		{
-			$WhereClause .= ($Arguments['ClauseOperator'])
+			$WhereClause .= (!empty($Arguments['ClauseOperator']))
 				? $Arguments['ClauseOperator'] . ' '
 				: '';
-			$WhereClause .= ($Arguments['FirstOperandTable'])
+			$WhereClause .= (!empty($Arguments['FirstOperandTable']))
 				? '`' . $Arguments['FirstOperandTable'] . '`.'
 				: '';
 			$WhereClause .= (empty($Arguments['isNotAField_First']))
 				? '`' . $Arguments['FirstOperand'] . '` '
 				: $Arguments['FirstOperand'] . ' ';
 			$WhereClause .= $Arguments['ExpressionOperator'] . ' ';
-			$WhereClause .= ($Arguments['SecondOperandTable'])
+			$WhereClause .= (!empty($Arguments['SecondOperandTable']))
 				? '`' . $Arguments['SecondOperandTable'] . '`.'
 				: '';
 			$WhereClause .= (!empty($Arguments['SecondOperand']))
