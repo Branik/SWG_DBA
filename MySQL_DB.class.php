@@ -342,7 +342,7 @@
 # -- $ResultResource
 # affected_rows()
 
-namespace NS;
+namespace SWGDAL;
 
 if (0 > \version_compare(\PHP_VERSION, '5'))
 {
@@ -362,17 +362,17 @@ require_once('DBInterface.class.php');
 
 final class MySQL_DB extends DBInterface
 {
-
-	const DB_HOST = 'localhost';
-	const DB_USER = 'user';
-	const DB_PASS = 'pass';
-	const DB_NAME = 'db';
-
 	# \InvalidArgumentException Codes
+
 	const MISSING_DATA = 1;
 	const WRONG_TYPE = 2;
 	const WRONG_VALUE = 3;
 
+	private $DB_HOST = \NULL;
+	private $DB_USER = \NULL;
+	private $DB_PASS = \NULL;
+	private $DB_NAME = \NULL;
+	private $Timezone = '-5:00';
 	protected $DB_Con = \NULL;
 	protected $Debug = \FALSE;
 	public $Debugging = \NULL;
@@ -414,13 +414,28 @@ final class MySQL_DB extends DBInterface
 		$this->InputParams = \NULL;
 		$this->InputBindParams = \NULL;
 
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Reset query.';
+			$this->Debugging->WriteToLog($LogData);
+		}
+
+		return $this;
 		# end ResetQuery()
+	}
+
+
+	public function SetCredentials($DB_HOST, $DB_USER, $DB_PASS)
+	{
+		$this->DB_HOST = $DB_HOST;
+		$this->DB_USER = $DB_USER;
+		$this->DB_PASS = $DB_PASS;
 	}
 
 
 	public function SetDebug($Debug)
 	{
-		$this->Debug = Sanitize('boolean', $Debug);
+		$this->Debug = Sanitize($Debug, 'boolean');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -474,8 +489,12 @@ final class MySQL_DB extends DBInterface
 		$this->InputParams = array();
 		foreach ($Params as $Value)
 		{
-			$Type = \gettype($Value);
-			$this->InputParams[] = Sanitize($Type, $Value);
+			$this->InputParams[] = Sanitize($Value);
+		}
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Sent Params' . \var_export($Params, \TRUE) . ' Set Input Params: ' . \var_export($this->InputParams, \TRUE);
+			$this->Debugging->WriteToLog($LogData);
 		}
 		return $this;
 
@@ -492,9 +511,9 @@ final class MySQL_DB extends DBInterface
 	}
 
 
-	public function SetOrderBy($OrderBy, $Direction = \NULL)
+	public function SetOrderBy(Array $OrderBy)
 	{
-		$this->QueryObj->SetOrderBy($OrderBy, $Direction);
+		$this->QueryObj->SetOrderBy($OrderBy);
 		return $this;
 
 		# end SetOrderBy
@@ -590,10 +609,10 @@ final class MySQL_DB extends DBInterface
 	}
 
 
-	public function Connect()
+	public function Connect($DB_NAME)
 	{
 		# get our database connection
-		$this->DB_Con = new \mysqli(self::DB_HOST, self::DB_USER, self::DB_PASS, self::DB_NAME);
+		$this->DB_Con = new \mysqli($this->DB_HOST, $this->DB_USER, $this->DB_PASS, $DB_NAME);
 
 		# check connection
 		if ($this->DB_Con->connect_errno)
@@ -604,6 +623,7 @@ final class MySQL_DB extends DBInterface
 		}
 
 		$this->DB_Con->query("SET NAMES 'utf8'");
+		$this->DB_Con->query("SET time_zone = '" . $this->Timezone . "'");
 
 		# get our query object
 		$this->QueryObj = new MySQL_Query($this);
@@ -649,11 +669,16 @@ final class MySQL_DB extends DBInterface
 			$this->QueryObj = \NULL;
 		}
 
+		if ($this->Debug === \TRUE)
+		{
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Close connection.';
+			$this->Debugging->WriteToLog($LogData);
+		}
 		# end Close()
 	}
 
 
-	public function SelectDB($Database)
+	public function SelectDB($DB_NAME)
 	{
 		$SelectDBCheck = \NULL;
 		if (!$this->DB_Con->select_db($Database))
@@ -826,7 +851,7 @@ final class MySQL_DB extends DBInterface
 			. $this->ErrorNo(), $this->ErrorNo());
 		}
 
-		return $this;
+		return $PrepareCheck;
 
 		# end PrepareQuery()
 	}
@@ -1159,6 +1184,8 @@ final class MySQL_DB extends DBInterface
 			. ' $this->SQL is empty. ', self::MISSING_DATA);
 		}
 
+		$Return = FALSE;
+
 		switch ($QueryType) {
 			case 'SELECT':
 			case 'SHOW TABLES':
@@ -1166,7 +1193,7 @@ final class MySQL_DB extends DBInterface
 			case 'DESCRIBE':
 			case 'EXPLAIN':
 				# these return a result set
-				if (!$this->CurrentResult = $this->DB_Con->query($this->SQL))
+				if (!$Return = $this->DB_Con->query($this->SQL))
 				{
 					throw new \DBException(__FILE__ . ' ' . __METHOD__
 					. ' run query failed. ' . \PHP_EOL . $this->Error()
@@ -1185,7 +1212,7 @@ final class MySQL_DB extends DBInterface
 			case 'LOCK TABLES':
 			case 'UNLOCK TABLES':
 				# these do not return result sets
-				if (!$this->DB_Con->query($this->SQL))
+				if (!$Return = $this->DB_Con->query($this->SQL))
 				{
 					throw new \DBException(__FILE__ . ' ' . __METHOD__
 					. ' run query failed. ' . \PHP_EOL . $this->Error()
@@ -1205,21 +1232,21 @@ final class MySQL_DB extends DBInterface
 			$this->Debugging->WriteToLog($LogData);
 		}
 
-		return $this;
+		return $Return;
 
 		# end RunQuery()
 	}
 
 
-	public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM')
+	public function FetchResults($Result, $ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM')
 	{
-		if (empty($this->CurrentResult))
+		if (empty($Result))
 		{
 			throw new \Exception(__FILE__ . ' ' . __METHOD__
 			. ' $this->CurrentResult is not set/empty.', self::MISSING_DATA);
 		}
 
-		$ResultCheck = (\gettype($this->CurrentResult) === 'object')
+		$ResultCheck = (\gettype($Result) === 'object')
 			? \TRUE
 			: \FALSE;
 
@@ -1231,29 +1258,29 @@ final class MySQL_DB extends DBInterface
 			. $this->ErrorNo(), $this->ErrorNo());
 		}
 
-		if ($this->NumRows() > 0)
+		if ($this->NumRows($Result) > 0)
 		{
 			switch ($ReturnFormat) {
 				case 'array':
 					switch ($ReturnArrFormat) {
 						case 'MYSQLI_NUM':
-							return $this->CurrentResult->fetch_array(\MYSQLI_NUM);
+							return $Result->fetch_array(\MYSQLI_NUM);
 							break;
 						case 'MYSQLI_BOTH':
-							return $this->CurrentResult->fetch_array(\MYSQLI_BOTH);
+							return $Result->fetch_array(\MYSQLI_BOTH);
 							break;
 						case 'MYSQLI_ASSOC':
 						default:
-							return $this->CurrentResult->fetch_array(\MYSQLI_ASSOC);
+							return $Result->fetch_array(\MYSQLI_ASSOC);
 							break;
 					}
 					break;
 				case 'object':
-					return $this->CurrentResult->fetch_object();
+					return $Result->fetch_object();
 					break;
 				case 'assoc':
 				default:
-					return $this->CurrentResult->fetch_assoc();
+					return $Result->fetch_assoc();
 					break;
 			}
 		} else
@@ -1271,12 +1298,12 @@ final class MySQL_DB extends DBInterface
 	}
 
 
-	public function CloseResult()
+	public function CloseResult($Result)
 	{
-		if ($this->CurrentResult)
+		if ($Result)
 		{
-			$this->CurrentResult->close();
-			unset($this->CurrentResult);
+			$Result->close();
+			unset($Result);
 		}
 
 		if ($this->Debug === \TRUE)
@@ -1291,15 +1318,19 @@ final class MySQL_DB extends DBInterface
 	}
 
 
-	public function NumRows()
+	public function NumRows($Result = NULL)
 	{
 		$returnValue = \NULL;
 		if (isset($this->SQLStmt))
 		{
 			$returnValue = $this->SQLStmt->num_rows;
+		} elseif (isset($Result))
+		{
+			$returnValue = $Result->num_rows;
 		} else
 		{
-			$returnValue = $this->CurrentResult->num_rows;
+			throw new \InvalidArgumentException(__FILE__ . ' ' . __METHOD__
+			. ' $Result is not set/empty. ', self::MISSING_DATA);
 		}
 
 		if ($this->Debug === \TRUE)
@@ -1346,6 +1377,8 @@ final class MySQL_DB extends DBInterface
 			. ' $QueryType is not set/empty. ', self::MISSING_DATA);
 		}
 
+		$Return = FALSE;
+
 		try {
 			$this->QueryObj->SetQuery($QueryType);
 		} catch (\InvalidArgumentException $exc) {
@@ -1357,10 +1390,10 @@ final class MySQL_DB extends DBInterface
 		try {
 			switch ($RunAs) {
 				case 'Standard':
-					$this->RunQuery($QueryType);
+					$Return = $this->RunQuery($QueryType);
 					break;
 				case 'Prepared':
-					$this->PrepareQuery();
+					$Return = $this->PrepareQuery();
 					break;
 			}
 		} catch (\InvalidArgumentException $exc) {
@@ -1378,7 +1411,7 @@ final class MySQL_DB extends DBInterface
 			$this->Debugging->WriteToLog($LogData);
 		}
 
-		return $this;
+		return $Return;
 
 		# end Query()
 	}

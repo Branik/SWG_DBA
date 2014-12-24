@@ -5,7 +5,7 @@
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
-# Copyright © 2009 - 2013 - SnowWolfe Games, LLC
+# Copyright © 2009 - 2014 - SnowWolfe Games, LLC
 # This file is part of DatabaseAbstractionLayer.
 # This script handles mysql database interactions.
 # methods:
@@ -269,7 +269,7 @@
 # - calls:
 # - Logger::WriteToLog
 
-namespace NS;
+namespace SWGDAL;
 
 if (0 > version_compare(PHP_VERSION, '5'))
 {
@@ -301,7 +301,7 @@ abstract class QueryInterface
 
 	abstract public function SetWhere(Array $Where);
 
-	abstract public function SetOrderBy($OrderBy, $Direction = NULL);
+	abstract public function SetOrderBy(Array $OrderBy);
 
 	abstract public function SetGroupBy($GroupBy);
 
@@ -365,3 +365,4 @@ abstract class QueryInterface
 }
 
 # end QueryInterface interface
+?>

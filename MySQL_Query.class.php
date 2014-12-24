@@ -5,7 +5,7 @@
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
-# Copyright © 2009 - 2013 - SnowWolfe Games, LLC
+# Copyright © 2009 - 2014 - SnowWolfe Games, LLC
 # This file is part of DatabaseAbstractionLayer.
 # This script handles mysql database interactions.
 # properties:
@@ -359,7 +359,7 @@
 # - calls:
 # - Logger::WriteToLog
 
-namespace NS;
+namespace SWGDAL;
 
 if (0 > \version_compare(PHP_VERSION, '5'))
 {
@@ -476,7 +476,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetDebug($Debug)
 	{
-		$this->Debug = Sanitize('boolean', $Debug);
+		$this->Debug = Sanitize($Debug, 'boolean');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -618,10 +618,10 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetTable($Table, $Alias = \NULL)
 	{
-		$this->Table = Sanitize('string', $Table);
+		$this->Table = Sanitize($Table, 'string');
 		if (isset($Alias))
 		{
-			$this->TableAlias = Sanitize('string', $Alias);
+			$this->TableAlias = Sanitize($Alias, 'string');
 		}
 		if ($this->Debug === \TRUE)
 		{
@@ -635,7 +635,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetJoinTables($JoinTables)
 	{
-		$this->JoinTables = Sanitize('string', $JoinTables);
+		$this->JoinTables = Sanitize($JoinTables, 'string');
 		foreach ($this->JoinTables AS $Value)
 		{
 			if (empty($Value['JoinAlias']))
@@ -656,14 +656,14 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement, $JoinAlias = \NULL)
 	{
-		$this->JoinType[] = Sanitize('string', $JoinType);
-		$this->JoinTable[] = Sanitize('string', $JoinTable);
+		$this->JoinType[] = Sanitize($JoinType, 'string');
+		$this->JoinTable[] = Sanitize($JoinTable, 'string');
 		if (!empty($JoinAlias))
 		{
-			$this->JoinAlias[] = Sanitize('string', $JoinAlias);
+			$this->JoinAlias[] = Sanitize($JoinAlias, 'string');
 		}
-		$this->JoinMethod[] = Sanitize('string', $JoinMethod);
-		$this->JoinStatement[] = Sanitize('string', $JoinStatement);
+		$this->JoinMethod[] = Sanitize($JoinMethod, 'string');
+		$this->JoinStatement[] = Sanitize($JoinStatement, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -677,10 +677,10 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetLockTables(Array $LockTables)
 	{
-		$this->LockTables = Sanitize('string', $LockTables);
+		$this->LockTables = Sanitize($LockTables, 'string');
 		if ($this->Debug === \TRUE)
 		{
-			$LogData = __FILE__ . ' ' . __METHOD__ . ' Lock tables: ' . \var_export($this->LockTables, true);
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Lock tables: ' . \var_export($this->LockTables, \true);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -693,7 +693,7 @@ final class MySQL_Query extends QueryInterface
 		$this->Columns = $Columns;
 		if ($this->Debug === \TRUE)
 		{
-			$LogData = __FILE__ . ' ' . __METHOD__ . ' Select columns: ' . \var_export($this->Columns, true);
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Select columns: ' . \var_export($this->Columns, \true);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -707,13 +707,13 @@ final class MySQL_Query extends QueryInterface
 		{
 			if (!empty($Value['SecondOperand']))
 			{
-				$Value['SecondOperand'] = Sanitize('string', $Value['SecondOperand']);
+				$Value['SecondOperand'] = Sanitize($Value['SecondOperand']);
 			}
 		}
 		$this->Where = $Where;
 		if ($this->Debug === \TRUE)
 		{
-			$LogData = __FILE__ . ' ' . __METHOD__ . ' Where arguments: ' . \var_export($this->Where, true);
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Where arguments: ' . \var_export($this->Where, \true);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -721,18 +721,14 @@ final class MySQL_Query extends QueryInterface
 	}
 
 
-	public function SetOrderBy($OrderBy, $Direction = \NULL)
+	public function SetOrderBy(Array $OrderBy)
 	{
-		$this->OrderBy = Sanitize('string', $OrderBy);
-		if (!empty($Direction))
-		{
-			$this->OrderByDir = Sanitize('sort', $Direction);
-		}
+		$this->OrderBy = Sanitize($OrderBy, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
 			$LogData = __FILE__ . ' ' . __METHOD__ . ' Order By: '
-				. $this->OrderBy;
+				. var_export($this->OrderBy, \TRUE);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -742,7 +738,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetGroupBy($GroupBy)
 	{
-		$this->GroupBy = Sanitize('string', $GroupBy);
+		$this->GroupBy = Sanitize($GroupBy, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -756,7 +752,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetLimit($Limit, $Offset = \NULL)
 	{
-		$Limit = Sanitize('int', $Limit);
+		$Limit = Sanitize($Limit, 'int');
 		if ($Limit !== \FALSE)
 		{
 			$this->Limit = $Limit;
@@ -766,7 +762,7 @@ final class MySQL_Query extends QueryInterface
 		}
 		if (isset($Offset))
 		{
-			$Offset = Sanitize('int', $Offset);
+			$Offset = Sanitize($Offset, 'int');
 			if ($Offset !== \FALSE)
 			{
 				$this->Offset = $Offset;
@@ -790,7 +786,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetInsertValues(Array $Values)
 	{
-		$this->InsertValues = Sanitize('string', $Values);
+		$this->InsertValues = $Values;
 
 		if ($this->Debug === \TRUE)
 		{
@@ -805,7 +801,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetDuplicateKey(array $DuplicateKey)
 	{
-		$this->DuplicateKey = Sanitize('string', $DuplicateKey);
+		$this->DuplicateKey = Sanitize($DuplicateKey, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -819,7 +815,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetEngine($Engine)
 	{
-		$this->Engine = Sanitize('string', $Engine);
+		$this->Engine = Sanitize($Engine, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -857,6 +853,15 @@ final class MySQL_Query extends QueryInterface
 		if (!empty($this->Where))
 		{
 			$this->SQL .= $this->BuildWhereClause();
+		}
+		if (!empty($this->GroupBy))
+		{
+			$this->SQL .= ' GROUP BY ';
+			foreach ($this->GroupBy as $Value)
+			{
+				$this->SQL .= $Value . ", ";
+			}
+			$this->SQL = \rtrim($this->SQL, ", ");
 		}
 		if (!empty($this->OrderBy))
 		{
@@ -1240,6 +1245,9 @@ final class MySQL_Query extends QueryInterface
 				{
 					$UpdateClause .= "'" . $Value . "', ";
 				}
+			} elseif (!empty($FieldArray['If']))
+			{
+				$UpdateClause .= 'IF((`' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'] . ') ' . $FieldArray['ComparisonOperator'] . ' ' . $FieldArray['ComparisonValue'] . ', ' . $FieldArray['ComparisonValue'] . ', (`' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'] . ')), ';
 			} elseif (!empty($FieldArray['Maths']))
 			{
 				$UpdateClause .= ' `' . $FieldArray['Field'] . '` ' . $FieldArray['Maths'] . ', ';
@@ -1266,7 +1274,7 @@ final class MySQL_Query extends QueryInterface
 	{
 		$Fields = '(';
 		$TrimmedFields = \NULL;
-		$Values = \NULL;
+		$InsValues = \NULL;
 		$TrimmedValues = \NULL;
 		$AllValues = \NULL;
 		$TrimmedAllValues = \NULL;
@@ -1279,29 +1287,30 @@ final class MySQL_Query extends QueryInterface
 		$TrimmedFields .= ')';
 		if (isset($this->InsertValues))
 		{
-			foreach ($this->InsertValues as $ValuesArray)
+			foreach ($this->InsertValues as $Values)
 			{
-				foreach ($ValuesArray as $Value)
+				foreach ($Values as $Value)
 				{
-					if (\is_numeric($FieldArray['Value']))
+					if (\is_numeric($Value['Value']))
 					{
-						$Values .= $this->DB_Con->EscapeString($Value['Value']) . ', ';
+						$InsValues .= $this->DB_Con->EscapeString($Value['Value']) . ', ';
 					} else
 					{
-						$Values .= "'" . $this->DB_Con->EscapeString($Value['Value']) . "', ";
+						$InsValues .= "'" . $this->DB_Con->EscapeString($Value['Value']) . "', ";
 					}
 				}
-				$TrimmedValues = \rtrim($Values, ", ");
-				$AllValues = '(' . $TrimmedValues . '),' . PHP_EOL;
+				$TrimmedValues = \rtrim($InsValues, ", ");
+				$AllValues .= '(' . $TrimmedValues . '),' . PHP_EOL;
+				unset($InsValues, $TrimmedValues);
 			}
-			$TrimmedAllValues = \rtrim($AllValues, ",");
+			$TrimmedAllValues = \rtrim($AllValues, ',' . PHP_EOL);
 		} else
 		{
 			foreach ($this->Columns as $FieldArray)
 			{
-				$Values .= '?, ';
+				$InsValues .= '?, ';
 			}
-			$TrimmedValues = \rtrim($Values, ", ");
+			$TrimmedValues = \rtrim($InsValues, ", ");
 			$TrimmedAllValues = '(' . $TrimmedValues . ')';
 		}
 
@@ -1508,12 +1517,16 @@ final class MySQL_Query extends QueryInterface
 				? '`' . $Arguments['SecondOperandTable'] . '`.'
 				: '';
 			$WhereClause .= (!empty($Arguments['SecondOperand']))
-				? (!empty($Arguments['isAField_Second']))
+				? ((!empty($Arguments['isAField_Second']))
 					? "`" . $this->DB_Con->EscapeString($Arguments['SecondOperand']) . "`"
-					: (\is_numeric($Arguments['SecondOperand']))
+					: ((\is_numeric($Arguments['SecondOperand']) ||
+					\is_bool($Arguments['SecondOperand']))
 						? $this->DB_Con->EscapeString($Arguments['SecondOperand'])
-						: "'" . $this->DB_Con->EscapeString($Arguments['SecondOperand']) . "'"
-				: '?';
+						: "'" . $this->DB_Con->EscapeString($Arguments['SecondOperand']) . "'"))
+				: ((\is_numeric($Arguments['SecondOperand']) ||
+				\is_bool($Arguments['SecondOperand']))
+					? $this->DB_Con->EscapeString($Arguments['SecondOperand'])
+					: '?');
 			$WhereClause .= ' ';
 		}
 		if ($this->Debug === \TRUE)
@@ -1531,11 +1544,21 @@ final class MySQL_Query extends QueryInterface
 	{
 		if (!empty($this->OrderBy))
 		{
-			$OrderByClause = "ORDER BY " . $this->OrderBy . ' ';
-			if (isset($this->OrderByDir))
+			$OrderByClause = 'ORDER BY ';
+			foreach ($this->OrderBy as $OrderBy)
 			{
-				$OrderByClause .= $this->OrderByDir . ' ';
+				$OrderByClause .= $OrderBy['Column'] . " ";
+				if (!empty($OrderBy['Direction']))
+				{
+					$OrderByClause .= $OrderBy['Direction'] . ", ";
+				} else
+				{
+					$OrderByClause .= ", ";
+				}
 			}
+
+			$OrderByClause = \rtrim($OrderByClause, ", ");
+			$OrderByClause .= " ";
 		}
 		if ($this->Debug === \TRUE)
 		{

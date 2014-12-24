@@ -259,7 +259,7 @@
 # -- $ResultResource
 # affected_rows()
 
-namespace NS;
+namespace SWGDAL;
 
 if (0 > version_compare(PHP_VERSION, '5'))
 {
@@ -279,6 +279,8 @@ abstract class DBInterface
 
 	abstract public function __destruct();
 
+	abstract public function SetCredentials($DB_HOST, $DB_USER, $DB_PASS);
+
 	abstract public function SetDebug($Debug);
 
 	abstract public function SetTable($Table, $Alias = NULL);
@@ -291,7 +293,7 @@ abstract class DBInterface
 
 	abstract public function SetWhere(Array $Where);
 
-	abstract public function SetOrderBy($OrderBy, $Direction = NULL);
+	abstract public function SetOrderBy(Array $OrderBy);
 
 	abstract public function SetGroupBy($GroupBy);
 
@@ -307,13 +309,13 @@ abstract class DBInterface
 
 	abstract protected function StartDebugging();
 
-	abstract public function Connect();
+	abstract public function Connect($DB_NAME);
 
 	abstract public function Connected();
 
 	abstract public function Close();
 
-	abstract public function SelectDB($Database);
+	abstract public function SelectDB($DB_NAME);
 
 	abstract public function ErrorNo();
 
@@ -349,11 +351,11 @@ abstract class DBInterface
 
 	abstract protected function RunQuery($QueryType);
 
-	abstract public function FetchResults($ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
+	abstract public function FetchResults($Result, $ReturnFormat = 'assoc', $ReturnArrFormat = 'MYSQLI_NUM');
 
-	abstract public function CloseResult();
+	abstract public function CloseResult($Result);
 
-	abstract public function NumRows();
+	abstract public function NumRows($Result = NULL);
 
 	abstract public function AffectedRows();
 
@@ -363,3 +365,4 @@ abstract class DBInterface
 }
 
 # end of interface DBInterface
+?>
