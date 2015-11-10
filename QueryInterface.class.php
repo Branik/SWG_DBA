@@ -5,9 +5,12 @@
 # <http://snowwolfegames.com>
 # <nikki@snowwolfegames.com>
 #
-# Copyright Â© 2009 - 2014 - SnowWolfe Games, LLC
+# Copyright © 2009 - 2015 - SnowWolfe Games, LLC
+#
 # This file is part of DatabaseAbstractionLayer.
+#
 # This script handles mysql database interactions.
+#
 # methods:
 # __construct()
 # -- parameters:
@@ -271,9 +274,9 @@
 
 namespace SWGDAL;
 
-if (0 > version_compare(PHP_VERSION, '5'))
+if (0 > \version_compare(\PHP_VERSION, '5.5'))
 {
-	throw new Exception('This file was generated for PHP 5');
+	throw new \Exception('This file was generated for PHP 5.5 or greater');
 }
 
 abstract class QueryInterface
