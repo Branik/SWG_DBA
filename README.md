@@ -3,6 +3,13 @@ SWG_DBA
 
 SnowWolfe Games, LLC Database Abstraction Layer
 
+Dependencies:
+SWG Logger: https://github.com/Branik/SWG_Logger
+
+php >= 5.5
+mysqli extension
+
+
 # regular select
 	$Columns = [
 		[
