@@ -122,7 +122,7 @@
 # 		- boolean
 # 		- sets debug on (\TRUE) or off (\FALSE)
 # -- calls:
-# 		- Sanitize()
+# 		- \Site\Sanitize()
 # SetQuery()
 # - Sets the $SQL variable
 # -- parameters:
@@ -139,7 +139,7 @@
 # 		- string
 # 		- holds the alias to use for the table in the query
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetJoinTables()
 # - Sets the $JoinTable, $JoinType, $JoinMethod, $JoinStatement variables
@@ -157,7 +157,7 @@
 # 		- string
 # 		- holds the statement for joining the tables
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetLockTables()
 # - Sets the $LockTables variable
@@ -166,7 +166,7 @@
 # 		- array
 # 		- holds the names of the tables to be locked
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetColums()
 # - Sets the $SelectColumns variable
@@ -175,7 +175,7 @@
 # 		- array
 # 		- holds the names of the columns to be selected
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetWhere()
 # - Sets the $Where variable
@@ -184,7 +184,7 @@
 # 		- array
 # 		- holds the information for creating a where clause
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetOrderBy()
 # - Sets the $OrderBy variable
@@ -196,7 +196,7 @@
 # 		- array
 # 		- holds the order by direction
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetGroupBy()
 # - Sets the $GroupBy variable
@@ -205,7 +205,7 @@
 # 		- string
 # 		- holds the field to group by
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetLimit()
 # - Sets the $Limit variable
@@ -218,7 +218,7 @@
 # 		- holds the offset number
 # 		- defaults to null
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetInsertValues()
 # - Sets the $InsertValues variable
@@ -227,7 +227,7 @@
 # 		- array
 # 		- holds the values for an insert query
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetDuplicateKey()
 # - Sets the $GroupBy variable
@@ -236,7 +236,7 @@
 # 		- array
 # 		- holds the field to update on duplicate key
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # SetEnginey()
 # - Sets the $Engine variable
@@ -245,7 +245,7 @@
 # 		- string
 # 		- holds the engine to use
 # - calls:
-# - Sanitize()
+# - \Site\Sanitize()
 # - Logger::WriteToLog
 # GetSQL()
 # - returns:
@@ -476,7 +476,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetDebug($Debug)
 	{
-		$this->Debug = Sanitize($Debug, 'boolean');
+		$this->Debug = \Site\Sanitize($Debug, 'boolean');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -618,10 +618,10 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetTable($Table, $Alias = \NULL)
 	{
-		$this->Table = Sanitize($Table, 'string');
+		$this->Table = \Site\Sanitize($Table, 'string');
 		if (isset($Alias))
 		{
-			$this->TableAlias = Sanitize($Alias, 'string');
+			$this->TableAlias = \Site\Sanitize($Alias, 'string');
 		}
 		if ($this->Debug === \TRUE)
 		{
@@ -635,7 +635,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetJoinTables($JoinTables)
 	{
-		$this->JoinTables = Sanitize($JoinTables, 'string');
+		$this->JoinTables = \Site\Sanitize($JoinTables, 'string');
 		foreach ($this->JoinTables AS $Value)
 		{
 			if (empty($Value['JoinAlias']))
@@ -656,14 +656,14 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetJoinTable($JoinType, $JoinTable, $JoinMethod, $JoinStatement, $JoinAlias = \NULL)
 	{
-		$this->JoinType[] = Sanitize($JoinType, 'string');
-		$this->JoinTable[] = Sanitize($JoinTable, 'string');
+		$this->JoinType[] = \Site\Sanitize($JoinType, 'string');
+		$this->JoinTable[] = \Site\Sanitize($JoinTable, 'string');
 		if (!empty($JoinAlias))
 		{
-			$this->JoinAlias[] = Sanitize($JoinAlias, 'string');
+			$this->JoinAlias[] = \Site\Sanitize($JoinAlias, 'string');
 		}
-		$this->JoinMethod[] = Sanitize($JoinMethod, 'string');
-		$this->JoinStatement[] = Sanitize($JoinStatement, 'string');
+		$this->JoinMethod[] = \Site\Sanitize($JoinMethod, 'string');
+		$this->JoinStatement[] = \Site\Sanitize($JoinStatement, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -677,7 +677,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetLockTables(Array $LockTables)
 	{
-		$this->LockTables = Sanitize($LockTables, 'string');
+		$this->LockTables = \Site\Sanitize($LockTables, 'string');
 		if ($this->Debug === \TRUE)
 		{
 			$LogData = __FILE__ . ' ' . __METHOD__ . ' Lock tables: ' . \var_export($this->LockTables, \true);
@@ -707,7 +707,7 @@ final class MySQL_Query extends QueryInterface
 		{
 			if (!empty($Value['SecondOperand']))
 			{
-				$Value['SecondOperand'] = Sanitize($Value['SecondOperand']);
+				$Value['SecondOperand'] = \Site\Sanitize($Value['SecondOperand']);
 			}
 		}
 		$this->Where = $Where;
@@ -723,7 +723,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetOrderBy(Array $OrderBy)
 	{
-		$this->OrderBy = Sanitize($OrderBy, 'string');
+		$this->OrderBy = \Site\Sanitize($OrderBy, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -738,7 +738,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetGroupBy($GroupBy)
 	{
-		$this->GroupBy = Sanitize($GroupBy, 'string');
+		$this->GroupBy = \Site\Sanitize($GroupBy, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -752,7 +752,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetLimit($Limit, $Offset = \NULL)
 	{
-		$Limit = Sanitize($Limit, 'int');
+		$Limit = \Site\Sanitize($Limit, 'int');
 		if ($Limit !== \FALSE)
 		{
 			$this->Limit = $Limit;
@@ -762,7 +762,7 @@ final class MySQL_Query extends QueryInterface
 		}
 		if (isset($Offset))
 		{
-			$Offset = Sanitize($Offset, 'int');
+			$Offset = \Site\Sanitize($Offset, 'int');
 			if ($Offset !== \FALSE)
 			{
 				$this->Offset = $Offset;
@@ -791,7 +791,7 @@ final class MySQL_Query extends QueryInterface
 		if ($this->Debug === \TRUE)
 		{
 			$LogData = __FILE__ . ' ' . __METHOD__ . ' Values: '
-				. $this->InsertValues;
+				. var_export($this->InsertValues, \TRUE);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -801,11 +801,12 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetDuplicateKey(array $DuplicateKey)
 	{
-		$this->DuplicateKey = Sanitize($DuplicateKey, 'string');
+		$this->DuplicateKey = \Site\Sanitize($DuplicateKey, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
-			$LogData = __FILE__ . ' ' . __METHOD__ . ' Duplicate Key: ' . $this->DuplicateKey;
+			$LogData = __FILE__ . ' ' . __METHOD__ . ' Duplicate Key: '
+             . var_export($this->DuplicateKey, \TRUE);
 			$this->DB_Con->Debugging->WriteToLog($LogData);
 		}
 
@@ -815,7 +816,7 @@ final class MySQL_Query extends QueryInterface
 
 	public function SetEngine($Engine)
 	{
-		$this->Engine = Sanitize($Engine, 'string');
+		$this->Engine = \Site\Sanitize($Engine, 'string');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -1266,7 +1267,7 @@ final class MySQL_Query extends QueryInterface
 		}
 		return $TrimmedUpdateClause;
 
-		# end BuildSelectClause()
+		# end BuildUpdateClause()
 	}
 
 
@@ -1335,7 +1336,7 @@ final class MySQL_Query extends QueryInterface
 	protected function BuildOnDuplicateKeyClause()
 	{
 		$TrimmedDuplicateKeyClause = \NULL;
-		$DuplicateKeyClause .= "\n"
+		$DuplicateKeyClause = "\n"
 			. "ON DUPLICATE KEY UPDATE ";
 
 		foreach ($this->DuplicateKey as $FieldArray)
@@ -1364,6 +1365,7 @@ final class MySQL_Query extends QueryInterface
 
 	protected function BuildDeleteClause()
 	{
+	    $DeleteClause = \NULL;
 		if ($this->Debug == \TRUE)
 		{
 			$LogData = __FILE__ . ' ' . __METHOD__ . ' Delete clause: ' . $DeleteClause;
@@ -1371,7 +1373,7 @@ final class MySQL_Query extends QueryInterface
 		}
 		return $DeleteClause;
 
-		# end BuildSelectClause()
+		# end BuildDeleteClause()
 	}
 
 
@@ -1523,10 +1525,9 @@ final class MySQL_Query extends QueryInterface
 					\is_bool($Arguments['SecondOperand']))
 						? $this->DB_Con->EscapeString($Arguments['SecondOperand'])
 						: "'" . $this->DB_Con->EscapeString($Arguments['SecondOperand']) . "'"))
-				: ((\is_numeric($Arguments['SecondOperand']) ||
-				\is_bool($Arguments['SecondOperand']))
-					? $this->DB_Con->EscapeString($Arguments['SecondOperand'])
-					: '?');
+				: ((!isset($Arguments['SecondOperand']))
+					? '?'
+					: $this->DB_Con->EscapeString($Arguments['SecondOperand']));
 			$WhereClause .= ' ';
 		}
 		if ($this->Debug === \TRUE)
@@ -1547,14 +1548,19 @@ final class MySQL_Query extends QueryInterface
 			$OrderByClause = 'ORDER BY ';
 			foreach ($this->OrderBy as $OrderBy)
 			{
-				$OrderByClause .= $OrderBy['Column'] . " ";
-				if (!empty($OrderBy['Direction']))
+				if (!empty($OrderBy['Column']))
 				{
-					$OrderByClause .= $OrderBy['Direction'] . ", ";
-				} else
+					$OrderByClause .= "`" . $OrderBy['Column'] . "` ";
+					if (!empty($OrderBy['Direction']))
+					{
+						$OrderByClause .= $OrderBy['Direction'];
+					}
+				} elseif (!empty($OrderBy['SQLFunction']))
 				{
-					$OrderByClause .= ", ";
+					$OrderByClause .= $OrderBy['SQLFunction'];
 				}
+
+				$OrderByClause .= ", ";
 			}
 
 			$OrderByClause = \rtrim($OrderByClause, ", ");

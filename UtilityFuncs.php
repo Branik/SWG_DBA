@@ -100,7 +100,7 @@ function Sanitize($DataType, $Value)
 			} else
 			{
 				$Value = \strip_tags(trim($Value));
-				$ReturnValue = \htmlspecialchars(\filter_var($Value, \FILTER_SANITIZE_STRING, \FILTER_FLAG_NO_ENCODE_QUOTES), \ENT_QUOTES, 'UTF-8');
+				$ReturnValue = (\filter_var($Value, \FILTER_SANITIZE_STRING, \FILTER_FLAG_NO_ENCODE_QUOTES);
 			}
 			break;
 	}

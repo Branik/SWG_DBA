@@ -104,7 +104,7 @@
 # 		- boolean
 # 		- sets debug on (\TRUE) or off (\FALSE)
 # -- calls:
-# 		- Sanitize()
+# 		- \SiteSanitize()
 # SetTable()
 # - sets the table for a query
 # -- paramaters:
@@ -435,7 +435,7 @@ final class MySQL_DB extends DBInterface
 
 	public function SetDebug($Debug)
 	{
-		$this->Debug = Sanitize($Debug, 'boolean');
+		$this->Debug = \Site\Sanitize($Debug, 'boolean');
 
 		if ($this->Debug === \TRUE)
 		{
@@ -489,7 +489,7 @@ final class MySQL_DB extends DBInterface
 		$this->InputParams = array();
 		foreach ($Params as $Value)
 		{
-			$this->InputParams[] = Sanitize($Value);
+			$this->InputParams[] = \Site\Sanitize($Value);
 		}
 		if ($this->Debug === \TRUE)
 		{
@@ -556,6 +556,15 @@ final class MySQL_DB extends DBInterface
 	}
 
 
+	public function SetRawQuery($Query)
+	{
+		$this->SQL = \Site\Sanitize($Query, 'string');
+		return $this;
+
+		# end SetRawQuery()
+	}
+
+
 	public function SetEngine($Engine)
 	{
 		$this->QueryObj->SetEngine($Engine);
@@ -595,9 +604,9 @@ final class MySQL_DB extends DBInterface
 	protected function StartDebugging()
 	{
 		try {
-			$this->Debugging = new Logger();
+			$this->Debugging = new \SWGLog\Logger();
 			$this->Debugging->init('sqldebug', \TRUE, 'Medium', 'Debugging', \FALSE);
-			$this->Debugging->SetFilePath(OTHER_LOG);
+			$this->Debugging->SetFilePath(\Site\OTHER_LOG);
 			$LogData = 'Beginning debug log.';
 			$this->Debugging->OpenLogFile()->WriteToLog($LogData, \TRUE);
 		} catch (Exception $exc) {
@@ -626,8 +635,18 @@ final class MySQL_DB extends DBInterface
 		$this->DB_Con->query("SET time_zone = '" . $this->Timezone . "'");
 
 		# get our query object
-		$this->QueryObj = new MySQL_Query($this);
-		$this->QueryObj->SetDebug($this->Debug);
+		try {
+			$this->QueryObj = new MySQL_Query($this);
+			$this->QueryObj->SetDebug($this->Debug);
+		} catch (\Exception $exc) {
+			throw $exc;
+		}
+
+		if (\gettype($this->QueryObj) !== 'object')
+		{
+			throw new Exception('QueryObj is not an object.');
+		}
+
 		if ($this->Debug === \TRUE)
 		{
 			$LogData = __FILE__ . ' ' . __METHOD__ . ' Connected.';
@@ -1377,16 +1396,20 @@ final class MySQL_DB extends DBInterface
 			. ' $QueryType is not set/empty. ', self::MISSING_DATA);
 		}
 
-		$Return = FALSE;
+		$Return = \FALSE;
 
-		try {
-			$this->QueryObj->SetQuery($QueryType);
-		} catch (\InvalidArgumentException $exc) {
-			throw $exc;
-		} catch (\Exception $exc) {
-			throw $exc;
+		if (empty($this->SQL))
+		{
+			try {
+				$this->QueryObj->SetQuery($QueryType);
+			} catch (\InvalidArgumentException $exc) {
+				throw $exc;
+			} catch (\Exception $exc) {
+				throw $exc;
+			}
+			$this->SQL = $this->QueryObj->GetSQL();
 		}
-		$this->SQL = $this->QueryObj->GetSQL();
+
 		try {
 			switch ($RunAs) {
 				case 'Standard':

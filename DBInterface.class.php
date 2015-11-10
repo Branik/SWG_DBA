@@ -303,6 +303,8 @@ abstract class DBInterface
 
 	abstract public function SetDuplicateKey($DuplicateKey);
 
+	abstract public function SetRawQuery($Query);
+
 	abstract public function SetEngine($Engine);
 
 	abstract protected function GetParamType($Value);
